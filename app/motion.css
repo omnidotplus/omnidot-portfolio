@@ -56,11 +56,15 @@
 
 /* ---------- 3. HERO HEADLINE — per-letter cursor response ---------- */
 .od-h1{display:inline-block}
+/* words stay whole so line breaks only happen at spaces */
+.od-word{display:inline-block;white-space:nowrap}
 .od-h1 .od-ch{
   display:inline-block;will-change:transform,color;
   transition:transform 620ms var(--od-e),color 420ms var(--od-e),
              opacity 420ms var(--od-e)}
-.od-h1 .od-ch.od-sp{width:.26em}
+/* a fixed .26em space is 130px at 500px type, which pushed the line over
+   the container and forced a wrap. Render a real space instead. */
+.od-h1 .od-ch.od-sp{width:auto;white-space:pre}
 .od-h1:hover .od-ch{opacity:.34}
 .od-h1 .od-ch.od-near{
   opacity:1;color:var(--od-orange);

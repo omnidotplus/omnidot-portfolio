@@ -202,11 +202,26 @@ export default function MotionLayer() {
       h1.textContent = "";
       const shell = D.createElement("span");
       shell.className = "od-h1";
-      raw.split("").forEach((c) => {
-        const s = D.createElement("span");
-        s.className = "od-ch" + (c === " " ? " od-sp" : "");
-        s.textContent = c === " " ? " " : c;
-        shell.appendChild(s);
+      // Split by WORD first, letters inside. Splitting straight to characters
+      // makes every glyph its own inline-block, so the browser may break between
+      // any two of them — at 500px type that orphaned the trailing "." onto its
+      // own 405px line, which read as a huge empty gap under the hero.
+      raw.split(" ").forEach((word, wi, words) => {
+        const w = D.createElement("span");
+        w.className = "od-word";
+        word.split("").forEach((c) => {
+          const s2 = D.createElement("span");
+          s2.className = "od-ch";
+          s2.textContent = c;
+          w.appendChild(s2);
+        });
+        shell.appendChild(w);
+        if (wi < words.length - 1) {
+          const sp = D.createElement("span");
+          sp.className = "od-ch od-sp";
+          sp.textContent = " ";
+          shell.appendChild(sp);
+        }
       });
       h1.appendChild(shell);
 
