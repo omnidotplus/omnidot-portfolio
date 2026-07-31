@@ -214,6 +214,27 @@
 .header-menu-wrap.od-nav-open .menu-link:nth-child(7){transition-delay:330ms}
 .header-menu-link{cursor:pointer}
 
+/* ---------- 6b2. Team grid ----------
+   The export put the heading and the cards side by side, leaving the card
+   column 579px wide for three 347px cards. The third overflowed horizontally,
+   so it never intersected the viewport — meaning the reveal observer never
+   fired for it and it sat permanently at opacity 0. Stacking the heading above
+   the row gives all three room and puts them back in the observer's path. */
+.team-row{display:grid!important;grid-template-columns:1fr;gap:clamp(28px,4vw,56px);
+  align-items:start}
+.team-left-content-wrap{max-width:52ch}
+.team-right-content-wrap{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(16px,2vw,28px);width:100%}
+.team-item-right{width:auto!important;min-width:0}
+.team-item-right img{width:100%;height:auto;object-fit:cover}
+@media (max-width:860px){
+  .team-right-content-wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .team-right-content-wrap{grid-template-columns:1fr}
+}
+
 /* ---------- 6c. Header CTA ----------
    Reference lock resolution: K72 (primary) uses ghost pills for actions, but
    Pipe reserves the molten orange for the primary CTA specifically — and
@@ -275,37 +296,40 @@
   color:#000;transform:rotate(90deg)}
 .od-nav-close:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
-/* ---------- 6e. Section transition wire ----------
-   The band between Projects and Team was a pair of 1px rules at #0000001a —
-   invisible on this canvas, so it read as dead space. It now carries a pulse
-   that travels down the wire, and the motion layer hands the reader to the
-   next section when it comes into view. */
-.project-line-wrap{position:relative;overflow:hidden}
-.project-line-one{background-color:rgba(255,255,255,.10)!important}
-
-.od-anim .project-line-wrap::before,
-.od-anim .project-line-wrap::after{
-  content:"";position:absolute;left:50%;width:1px;height:26%;
-  margin-left:-1.5px;pointer-events:none;
+/* ---------- 6e. The rail ----------
+   Two 1px rules (.line-one) run the full document height down the centre.
+   In sparse stretches they are the only thing on screen, which is what made
+   those areas read as dead. A pulse rides them, fixed to the viewport so it is
+   present wherever the reader is rather than only in one band. */
+.od-anim .line-wrap::before,
+.od-anim .line-wrap::after{
+  content:"";position:fixed;left:50%;width:1px;height:16vh;
+  margin-left:-1.5px;z-index:4;pointer-events:none;
   background:linear-gradient(to bottom,
-    transparent 0%, var(--od-orange) 45%, #fff 62%, var(--od-orange) 78%, transparent 100%);
-  box-shadow:0 0 14px 1.5px rgba(241,94,38,.55);
-  animation:odWire 3.2s cubic-bezier(.5,0,.5,1) infinite}
-.od-anim .project-line-wrap::after{margin-left:1.5px;animation-delay:1.6s}
+    transparent 0%, var(--od-orange) 40%, #fff 55%, var(--od-orange) 70%, transparent 100%);
+  box-shadow:0 0 16px 2px rgba(241,94,38,.45);
+  animation:odRail 5.4s cubic-bezier(.45,0,.55,1) infinite}
+.od-anim .line-wrap::after{margin-left:1.5px;animation-delay:2.7s}
 
-@keyframes odWire{
-  0%   {top:-28%;opacity:0}
-  14%  {opacity:1}
-  86%  {opacity:1}
-  100% {top:100%;opacity:0}}
+@keyframes odRail{
+  0%   {top:-18vh;opacity:0}
+  12%  {opacity:.9}
+  88%  {opacity:.9}
+  100% {top:100vh;opacity:0}}
 
-/* while the hand-off runs, damp the pulse so two things aren't competing */
-.od-wire-handoff .project-line-wrap::before,
-.od-wire-handoff .project-line-wrap::after{opacity:.25;transition:opacity 240ms linear}
+/* in a sparse stretch the rail brightens — the cue that a hand-off is coming */
+.od-deadzone .line-wrap::before,
+.od-deadzone .line-wrap::after{
+  animation-duration:2.2s;
+  box-shadow:0 0 26px 4px rgba(241,94,38,.75)}
+
+/* and damps while the glide runs, so two things are not competing */
+.od-wire-handoff .line-wrap::before,
+.od-wire-handoff .line-wrap::after{opacity:.2;transition:opacity 200ms linear}
 
 @media (prefers-reduced-motion:reduce){
-  .od-anim .project-line-wrap::before,
-  .od-anim .project-line-wrap::after{animation:none;opacity:0}
+  .od-anim .line-wrap::before,
+  .od-anim .line-wrap::after{animation:none;opacity:0}
 }
 
 /* ---------- 7. Selection + MENU weight ---------- */

@@ -131,10 +131,24 @@ export default function MotionLayer() {
             el.classList.toggle("od-out", e.boundingClientRect.top < 0);
           }
         }),
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.06 }
+      // horizontal margin is deliberately huge: an element sitting outside the
+      // viewport on the x-axis never intersects, so it would stay at opacity 0
+      // forever. Vertical position is what should gate a reveal, not horizontal.
+      { rootMargin: "0px 100% -10% 100%", threshold: 0.06 }
     );
     marked.forEach((el) => revealIO.observe(el)); // never unobserved: replays
     cleanups.push(() => revealIO.disconnect());
+
+    // failsafe: nothing may remain invisible. If an element is still unrevealed
+    // after 4s it is shown regardless — a missing animation beats missing content.
+    const failsafe = setTimeout(() => {
+      marked.forEach((el) => {
+        if (!el.classList.contains("od-in") && !el.classList.contains("od-out")) {
+          el.classList.add("od-in");
+        }
+      });
+    }, 4000);
+    cleanups.push(() => clearTimeout(failsafe));
 
     /* ---------- metric counters ---------- */
     const counterIOs: IntersectionObserver[] = [];
@@ -336,94 +350,101 @@ export default function MotionLayer() {
       cleanups.push(() => removeEventListener("mousemove", onMove));
     }
 
-    /* ---------- phone link: dial on a phone, jump to contact on a desktop ----------
-       A tel: link on a machine that cannot place calls either does nothing or
-       hands off to some unwanted app, so on a fine pointer it scrolls to the
-       contact section instead. */
-    const callLink = D.querySelector<HTMLAnchorElement>(".header-call-link");
-    if (callLink) {
-      const onCall = (e: MouseEvent) => {
-        if (!FINE) return;                    // touch device: let tel: dial
-        e.preventDefault();
-        const target = D.querySelector<HTMLElement>("#contact, .contact");
-        target?.scrollIntoView({ behavior: "smooth", block: "start" });
-      };
-      if (FINE) {
-        callLink.setAttribute("aria-label", "Go to contact section");
-        callLink.setAttribute("title", "Get in touch");
-      }
-      callLink.addEventListener("click", onCall);
-      cleanups.push(() => callLink.removeEventListener("click", onCall));
-    }
+    /* ---------- sparse-stretch hand-off ----------
+       The hero is 1314px tall but its headline ends around 1000, so scrolling
+       into the tail shows almost nothing. Rather than hard-coding that one
+       spot, this measures how much of the viewport actually has content in it
+       and hands the reader forward when a stretch is essentially empty.
 
-    /* ---------- transition wire: hand the reader to the next section ----------
-       Custom eased scroll rather than scrollIntoView, because that cannot be
-       cancelled — and any auto-scroll the reader can't override is hostile.
-       Aborts the moment they touch the wheel, a key, or the screen. */
+       Custom eased scroll, not scrollIntoView: that cannot be cancelled, and an
+       auto-scroll the reader can't override is hostile. Any input aborts it. */
     let handoffActive = false;
-    const wire = D.querySelector<HTMLElement>(".project-line-wrap");
-    if (wire) {
-      let armed = true;
-      let lastY = scrollY;
-      let dir = 0;                       // must keep the DELTA, not the position:
-      const trackY = () => {             // storing only the last Y makes the
-        dir = scrollY - lastY;           // direction test always compare equal
-        lastY = scrollY;
-      };
-      addEventListener("scroll", trackY, { passive: true });
+    {
+      const sections = $("section[id], section[class]");
+      const content = $(
+        "h1,h2,h3,h4,p,img,svg,a,button,input,textarea," +
+        ".od-svc-row,.team-item-right,.testimonial-item,.project-bottom-h2"
+      ).filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.height > 36 && r.width > 36 && !el.closest(".od-bloom,.line-wrap");
+      });
 
-      const glide = (toY: number) => {
+      const BUCKET = 24;
+      const coverage = () => {
+        const vh = innerHeight;
+        const seen = new Set<number>();
+        for (const el of content) {
+          const r = el.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > vh) continue;
+          if (getComputedStyle(el).opacity === "0") continue;
+          const top = Math.max(0, r.top);
+          const bot = Math.min(vh, r.bottom);
+          for (let y = top; y < bot; y += BUCKET) seen.add(Math.floor(y / BUCKET));
+        }
+        return seen.size / Math.ceil(vh / BUCKET);
+      };
+
+      const glide = (toY: number, after: () => void) => {
         const fromY = scrollY;
         const dist = toY - fromY;
-        if (Math.abs(dist) < 8) return;
-        const dur = Math.min(1100, 380 + Math.abs(dist) * 0.55);
+        if (Math.abs(dist) < 24) { after(); return; }
+        const dur = Math.min(1200, 420 + Math.abs(dist) * 0.5);
         const t0 = performance.now();
         handoffActive = true;
         H.classList.add("od-wire-handoff");
 
         let cancelled = false;
         const abort = () => { cancelled = true; };
-        // any deliberate input wins over the hand-off
         addEventListener("wheel", abort, { passive: true, once: true });
         addEventListener("touchstart", abort, { passive: true, once: true });
         addEventListener("keydown", abort, { once: true });
 
+        const done = () => {
+          handoffActive = false;
+          H.classList.remove("od-wire-handoff");
+          H.classList.remove("od-deadzone");
+          after();
+        };
         const step = (t: number) => {
-          if (cancelled) {
-            handoffActive = false;
-            H.classList.remove("od-wire-handoff");
-            return;
-          }
+          if (cancelled) return done();
           const p = Math.min(1, (t - t0) / dur);
           const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
           scrollTo(0, fromY + dist * e);
           if (p < 1) requestAnimationFrame(step);
-          else {
-            handoffActive = false;
-            H.classList.remove("od-wire-handoff");
-            lastY = scrollY;
-          }
+          else done();
         };
         requestAnimationFrame(step);
       };
 
-      const wireIO = new IntersectionObserver(
-        (entries) =>
-          entries.forEach((e) => {
-            if (!e.isIntersecting) { armed = true; return; }   // re-arm on exit
-            if (!armed || handoffActive) return;
-            if (dir <= 0) return;                              // only travelling down
-            const next = wire.closest("section")?.nextElementSibling as HTMLElement | null;
-            if (!next) return;
-            armed = false;
-            glide(next.getBoundingClientRect().top + scrollY);
-          }),
-        { threshold: 0.55 }
-      );
-      wireIO.observe(wire);
+      let lastY = scrollY;
+      let idle: ReturnType<typeof setTimeout>;
+      let cooldown = 0;
+
+      const onScroll = () => {
+        const dir = scrollY - lastY;
+        lastY = scrollY;
+        if (handoffActive || dir <= 0) return;
+        clearTimeout(idle);
+        idle = setTimeout(() => {
+          if (handoffActive || performance.now() < cooldown) return;
+          if (scrollY + innerHeight >= document.body.scrollHeight - 40) return; // at the end
+          if (coverage() > 0.16) { H.classList.remove("od-deadzone"); return; }
+
+          const nextTop = sections
+            .map((s) => s.getBoundingClientRect().top + scrollY)
+            .filter((t) => t > scrollY + 8)
+            .sort((x, y) => x - y)[0];
+          if (nextTop === undefined) return;
+
+          H.classList.add("od-deadzone");          // rail brightens as the cue
+          setTimeout(() => glide(nextTop, () => { cooldown = performance.now() + 1200; }), 260);
+        }, 180);
+      };
+      addEventListener("scroll", onScroll, { passive: true });
       cleanups.push(() => {
-        wireIO.disconnect();
-        removeEventListener("scroll", trackY);
+        removeEventListener("scroll", onScroll);
+        clearTimeout(idle);
+        H.classList.remove("od-deadzone", "od-wire-handoff");
       });
     }
 
