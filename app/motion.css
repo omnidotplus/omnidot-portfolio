@@ -131,6 +131,8 @@
 }
 
 /* ---------- 5. PROJECTS — cursor-following x-ray puck ---------- */
+/* the whole card is now a link to its case study */
+.od-card-link{display:block;text-decoration:none;color:inherit}
 .project-left-bottom-content-wrap,.project-left-bottom-content-wrap-02,
 .project-right-bottom-content-wrap-02,.project-right-bottom-content-wrap-03{
   position:relative;overflow:hidden;cursor:none}
@@ -307,6 +309,95 @@
    the section reveals then read as one fading into the next. */
 .hero{padding-bottom:clamp(40px,5vh,80px)!important}
 .about,.services,.team,.testimonials{padding-top:clamp(56px,7vh,110px)}
+
+/* ============================================================
+   10. Case study page
+   Liron Moran for the dark gallery canvas and imagery-as-artwork;
+   PORTO ROCHA for the pinned-panel / flowing-field split; INK for
+   large-format minimally treated imagery. Orange stays interaction-only.
+   ============================================================ */
+.od-cs{max-width:1560px;margin:0 auto;padding:clamp(28px,4vw,64px)}
+
+.od-cs-head{padding:clamp(24px,6vh,80px) 0 clamp(28px,5vh,56px);
+  border-bottom:1px solid var(--od-hair)}
+.od-cs-back{display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--od-muted);text-decoration:none;
+  transition:color 320ms var(--od-e),gap 320ms var(--od-e)}
+.od-cs-back:hover{color:var(--od-orange);gap:14px}
+
+.od-cs-title{margin:clamp(20px,4vh,44px) 0 0;color:#fff;line-height:.9;
+  font-size:clamp(48px,9vw,148px);letter-spacing:-.02em;text-wrap:balance}
+.od-cs-summary{margin:clamp(14px,2vh,22px) 0 0;max-width:60ch;
+  font-size:clamp(15px,1.5vw,20px);line-height:1.5;color:rgba(255,255,255,.72)}
+
+.od-cs-tags{list-style:none;display:flex;flex-wrap:wrap;gap:8px;
+  margin:clamp(18px,3vh,32px) 0 0;padding:0}
+.od-cs-tags li{
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.62);
+  border:1px solid var(--od-hair);border-radius:999px;padding:7px 14px;
+  transition:border-color 320ms var(--od-e),color 320ms var(--od-e)}
+.od-cs-tags li:hover{border-color:var(--od-orange);color:#fff}
+
+/* --- the split --- */
+.od-cs-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,38%);
+  gap:clamp(24px,4vw,64px);align-items:start;padding-top:clamp(28px,5vh,56px);
+  transition:grid-template-columns 520ms var(--od-e)}
+.od-cs-body.od-cs-collapsed{grid-template-columns:minmax(0,1fr) 220px}
+
+/* left: media field */
+.od-cs-media{display:flex;flex-direction:column;gap:clamp(28px,5vh,72px);min-width:0}
+.od-cs-fig{margin:0}
+.od-cs-fig img{display:block;width:100%;height:auto;background:#111}
+.od-cs-fig figcaption{margin-top:12px;font-size:12px;letter-spacing:.04em;
+  color:var(--od-muted)}
+.od-cs-quote{margin:clamp(8px,2vh,24px) 0;padding:0 0 0 clamp(16px,2vw,28px);
+  border-left:2px solid var(--od-orange)}
+.od-cs-quote p{margin:0;color:#fff;line-height:1.15;text-wrap:balance;
+  font-size:clamp(22px,3.4vw,44px);letter-spacing:-.01em}
+.od-cs-quote cite{display:block;margin-top:14px;font-style:normal;
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--od-muted)}
+
+/* right: pinned panel — stays in frame, scrolls its own overflow */
+.od-cs-panel{position:sticky;top:clamp(16px,3vh,32px);
+  max-height:calc(100vh - clamp(32px,6vh,64px));
+  display:flex;flex-direction:column;min-width:0}
+.od-cs-toggle{
+  display:inline-flex;align-items:center;justify-content:space-between;gap:16px;
+  width:100%;padding:13px 16px 13px 20px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid var(--od-hair);
+  color:#fff;font-size:13px;font-weight:600;letter-spacing:.02em;
+  cursor:pointer;flex:none;
+  transition:background 320ms var(--od-e),border-color 320ms var(--od-e)}
+.od-cs-toggle:hover{background:var(--od-orange);border-color:var(--od-orange);color:#000}
+.od-cs-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.od-cs-toggle-mark{display:grid;place-items:center;width:22px;height:22px;
+  border-radius:50%;background:rgba(0,0,0,.22);font-size:11px;
+  transition:transform 420ms var(--od-e)}
+.od-cs-toggle:hover .od-cs-toggle-mark{transform:rotate(90deg)}
+
+.od-cs-panel-scroll{
+  margin-top:18px;overflow-y:auto;overscroll-behavior:contain;
+  padding-right:6px;scrollbar-width:thin}
+.od-cs-panel-scroll p{margin:0 0 1.05em;font-size:clamp(14px,1.15vw,16px);
+  line-height:1.65;color:rgba(255,255,255,.76)}
+.od-cs-panel-scroll p:first-child{color:rgba(255,255,255,.92)}
+
+.od-cs-credits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:22px 24px;margin:clamp(24px,4vh,40px) 0 0;
+  padding-top:clamp(20px,3vh,28px);border-top:1px solid var(--od-hair)}
+.od-cs-credits dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--od-muted);margin-bottom:6px}
+.od-cs-credits dd{margin:0;font-size:14px;line-height:1.5;color:#fff}
+.od-cs-credits dd span{display:block}
+
+@media (max-width:900px){
+  .od-cs-body,.od-cs-body.od-cs-collapsed{grid-template-columns:1fr}
+  /* pinning a full-width panel on a phone would cover the imagery */
+  .od-cs-panel{position:static;max-height:none;order:-1}
+  .od-cs-panel-scroll{overflow:visible;max-height:none}
+}
 
 /* ---------- 7. Selection + MENU weight ---------- */
 /* default browser blue reads as a bug on this canvas — use the brand accent */
