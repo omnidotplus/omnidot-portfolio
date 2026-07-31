@@ -215,24 +215,24 @@
 .header-menu-link{cursor:pointer}
 
 /* ---------- 6b2. Team grid ----------
-   The export put the heading and the cards side by side, leaving the card
-   column 579px wide for three 347px cards. The third overflowed horizontally,
-   so it never intersected the viewport — meaning the reveal observer never
-   fired for it and it sat permanently at opacity 0. Stacking the heading above
-   the row gives all three room and puts them back in the observer's path. */
-.team-row{display:grid!important;grid-template-columns:1fr;gap:clamp(28px,4vw,56px);
-  align-items:start}
-.team-left-content-wrap{max-width:52ch}
+   Three 347px cards were sitting in a 579px column, so the third overflowed
+   horizontally, never intersected the viewport, and the reveal observer never
+   fired for it — stuck at opacity 0 rather than merely clipped.
+
+   Fix inside the existing layout, NOT by restacking: .team-wrap is
+   position:sticky with overflow:hidden, so the section is a pinned box that
+   testimonials scrolls over. Making it taller pushes content out of that box
+   and the two sections visibly collide. So the cards share the row instead. */
 .team-right-content-wrap{
   display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:clamp(16px,2vw,28px);width:100%}
+  gap:clamp(12px,1.4vw,24px);align-items:start}
 .team-item-right{width:auto!important;min-width:0}
 .team-item-right img{width:100%;height:auto;object-fit:cover}
 @media (max-width:860px){
-  .team-right-content-wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .team-right-content-wrap{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 }
 @media (max-width:560px){
-  .team-right-content-wrap{grid-template-columns:1fr}
+  .team-right-content-wrap{grid-template-columns:1fr;gap:20px}
 }
 
 /* ---------- 6c. Header CTA ----------
@@ -296,41 +296,13 @@
   color:#000;transform:rotate(90deg)}
 .od-nav-close:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
-/* ---------- 6e. The rail ----------
-   Two 1px rules (.line-one) run the full document height down the centre.
-   In sparse stretches they are the only thing on screen, which is what made
-   those areas read as dead. A pulse rides them, fixed to the viewport so it is
-   present wherever the reader is rather than only in one band. */
-.od-anim .line-wrap::before,
-.od-anim .line-wrap::after{
-  content:"";position:fixed;left:50%;width:1px;height:16vh;
-  margin-left:-1.5px;z-index:4;pointer-events:none;
-  background:linear-gradient(to bottom,
-    transparent 0%, var(--od-orange) 40%, #fff 55%, var(--od-orange) 70%, transparent 100%);
-  box-shadow:0 0 16px 2px rgba(241,94,38,.45);
-  animation:odRail 5.4s cubic-bezier(.45,0,.55,1) infinite}
-.od-anim .line-wrap::after{margin-left:1.5px;animation-delay:2.7s}
-
-@keyframes odRail{
-  0%   {top:-18vh;opacity:0}
-  12%  {opacity:.9}
-  88%  {opacity:.9}
-  100% {top:100vh;opacity:0}}
-
-/* in a sparse stretch the rail brightens — the cue that a hand-off is coming */
-.od-deadzone .line-wrap::before,
-.od-deadzone .line-wrap::after{
-  animation-duration:2.2s;
-  box-shadow:0 0 26px 4px rgba(241,94,38,.75)}
-
-/* and damps while the glide runs, so two things are not competing */
-.od-wire-handoff .line-wrap::before,
-.od-wire-handoff .line-wrap::after{opacity:.2;transition:opacity 200ms linear}
-
-@media (prefers-reduced-motion:reduce){
-  .od-anim .line-wrap::before,
-  .od-anim .line-wrap::after{animation:none;opacity:0}
-}
+/* ---------- 6e. Close the dead stretches ----------
+   The hero carried 300px top / 145px bottom padding, so its tail was a long
+   empty run with nothing but the centre rules in it. Rather than trying to
+   decorate dead space or auto-scroll past it, the space is simply removed —
+   the section reveals then read as one fading into the next. */
+.hero{padding-bottom:clamp(40px,5vh,80px)!important}
+.about,.services,.team,.testimonials{padding-top:clamp(56px,7vh,110px)}
 
 /* ---------- 7. Selection + MENU weight ---------- */
 /* default browser blue reads as a bug on this canvas — use the brand accent */

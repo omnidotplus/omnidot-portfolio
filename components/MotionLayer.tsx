@@ -350,104 +350,6 @@ export default function MotionLayer() {
       cleanups.push(() => removeEventListener("mousemove", onMove));
     }
 
-    /* ---------- sparse-stretch hand-off ----------
-       The hero is 1314px tall but its headline ends around 1000, so scrolling
-       into the tail shows almost nothing. Rather than hard-coding that one
-       spot, this measures how much of the viewport actually has content in it
-       and hands the reader forward when a stretch is essentially empty.
-
-       Custom eased scroll, not scrollIntoView: that cannot be cancelled, and an
-       auto-scroll the reader can't override is hostile. Any input aborts it. */
-    let handoffActive = false;
-    {
-      const sections = $("section[id], section[class]");
-      const content = $(
-        "h1,h2,h3,h4,p,img,svg,a,button,input,textarea," +
-        ".od-svc-row,.team-item-right,.testimonial-item,.project-bottom-h2"
-      ).filter((el) => {
-        const r = el.getBoundingClientRect();
-        return r.height > 36 && r.width > 36 && !el.closest(".od-bloom,.line-wrap");
-      });
-
-      const BUCKET = 24;
-      const coverage = () => {
-        const vh = innerHeight;
-        const seen = new Set<number>();
-        for (const el of content) {
-          const r = el.getBoundingClientRect();
-          if (r.bottom < 0 || r.top > vh) continue;
-          if (getComputedStyle(el).opacity === "0") continue;
-          const top = Math.max(0, r.top);
-          const bot = Math.min(vh, r.bottom);
-          for (let y = top; y < bot; y += BUCKET) seen.add(Math.floor(y / BUCKET));
-        }
-        return seen.size / Math.ceil(vh / BUCKET);
-      };
-
-      const glide = (toY: number, after: () => void) => {
-        const fromY = scrollY;
-        const dist = toY - fromY;
-        if (Math.abs(dist) < 24) { after(); return; }
-        const dur = Math.min(1200, 420 + Math.abs(dist) * 0.5);
-        const t0 = performance.now();
-        handoffActive = true;
-        H.classList.add("od-wire-handoff");
-
-        let cancelled = false;
-        const abort = () => { cancelled = true; };
-        addEventListener("wheel", abort, { passive: true, once: true });
-        addEventListener("touchstart", abort, { passive: true, once: true });
-        addEventListener("keydown", abort, { once: true });
-
-        const done = () => {
-          handoffActive = false;
-          H.classList.remove("od-wire-handoff");
-          H.classList.remove("od-deadzone");
-          after();
-        };
-        const step = (t: number) => {
-          if (cancelled) return done();
-          const p = Math.min(1, (t - t0) / dur);
-          const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-          scrollTo(0, fromY + dist * e);
-          if (p < 1) requestAnimationFrame(step);
-          else done();
-        };
-        requestAnimationFrame(step);
-      };
-
-      let lastY = scrollY;
-      let idle: ReturnType<typeof setTimeout>;
-      let cooldown = 0;
-
-      const onScroll = () => {
-        const dir = scrollY - lastY;
-        lastY = scrollY;
-        if (handoffActive || dir <= 0) return;
-        clearTimeout(idle);
-        idle = setTimeout(() => {
-          if (handoffActive || performance.now() < cooldown) return;
-          if (scrollY + innerHeight >= document.body.scrollHeight - 40) return; // at the end
-          if (coverage() > 0.16) { H.classList.remove("od-deadzone"); return; }
-
-          const nextTop = sections
-            .map((s) => s.getBoundingClientRect().top + scrollY)
-            .filter((t) => t > scrollY + 8)
-            .sort((x, y) => x - y)[0];
-          if (nextTop === undefined) return;
-
-          H.classList.add("od-deadzone");          // rail brightens as the cue
-          setTimeout(() => glide(nextTop, () => { cooldown = performance.now() + 1200; }), 260);
-        }, 180);
-      };
-      addEventListener("scroll", onScroll, { passive: true });
-      cleanups.push(() => {
-        removeEventListener("scroll", onScroll);
-        clearTimeout(idle);
-        H.classList.remove("od-deadzone", "od-wire-handoff");
-      });
-    }
-
     /* ---------- section magnetism ---------- */
     const secs = $("section[id]");
     if (secs.length > 1) {
@@ -455,7 +357,7 @@ export default function MotionLayer() {
       let animating = false;
       let lastY = scrollY;
       const onScroll = () => {
-        if (animating || handoffActive) return;   // the wire hand-off owns the scroll
+        if (animating) return;
         clearTimeout(idle);
         idle = setTimeout(() => {
           const dir = scrollY - lastY;
