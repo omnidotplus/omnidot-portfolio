@@ -91,7 +91,6 @@ export default function MotionLayer() {
       // section eyebrows ("/ / / / OUR TEAM") and their headings — these were
       // never in the list, so they appeared once and then sat static
       ".about-t,.service-top-left-text,.project-t,.team-top-text,.testi-t,.contact-t",
-      ".about-h2,.team-top-h2,.contact-h2,.project-top-h2,.testimonial-h2",
       ".hero-text-wrap,.hero-fast-text,.hero-bottom-text,.hero-right-img-content-wrap",
       ".about-left-content-wrap,.about-right-content-wrap",
       ".od-svc-row",
@@ -149,6 +148,58 @@ export default function MotionLayer() {
       });
     }, 4000);
     cleanups.push(() => clearTimeout(failsafe));
+
+
+    /* ---------- scroll-linked heading fill ----------
+       Words turn from muted to white as the heading travels through the
+       viewport, so the type resolves as the reader arrives at it. */
+    {
+      const FILL = ".about-h2,.team-top-h2,.contact-h2,.testi-h2,.service-h2,.project-left-title";
+      const heads = $(FILL).filter((el) => !el.querySelector(".od-w"));
+      heads.forEach((el) => {
+        const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+        if (!text) return;
+        el.textContent = "";
+        el.classList.add("od-fill");
+        text.split(" ").forEach((word, i, arr) => {
+          const w = D.createElement("span");
+          w.className = "od-w";
+          w.textContent = word + (i < arr.length - 1 ? " " : "");
+          el.appendChild(w);
+        });
+      });
+
+      if (heads.length) {
+        let pending = false;
+        const paint = () => {
+          pending = false;
+          const vh = innerHeight;
+          heads.forEach((el) => {
+            const r = el.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > vh) return;
+            // 0 when the heading's top reaches 85% down the viewport,
+            // 1 by the time it has risen to 35% — the reading band
+            const p = (vh * 0.85 - r.top) / (vh * 0.5);
+            const clamped = Math.max(0, Math.min(1, p));
+            const words = el.querySelectorAll<HTMLElement>(".od-w");
+            const lit = Math.round(clamped * words.length);
+            words.forEach((w, i) => w.classList.toggle("od-w-on", i < lit));
+          });
+        };
+        const onScroll = () => {
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(paint);
+        };
+        addEventListener("scroll", onScroll, { passive: true });
+        addEventListener("resize", onScroll, { passive: true });
+        paint();
+        cleanups.push(() => {
+          removeEventListener("scroll", onScroll);
+          removeEventListener("resize", onScroll);
+        });
+      }
+    }
 
     /* ---------- metric counters ---------- */
     const counterIOs: IntersectionObserver[] = [];

@@ -411,6 +411,20 @@ h1,h2,h3,h4,h5,h6,
 .hero-bottom-h1{font-size:clamp(52px,13.2vw,196px)!important;line-height:.86!important}
 .od-cs-title{font-size:clamp(44px,8vw,132px);line-height:.88}
 
+/* ---------- 6g. Scroll-linked heading fill ----------
+   Headings start muted and fill to white word by word as they travel through
+   the viewport. This replaces the opacity reveal on these elements — running
+   both made the type look like it was fading twice. */
+.od-fill{color:rgba(255,255,255,.26)}
+.od-fill .od-w{
+  color:rgba(255,255,255,.26);
+  transition:color 420ms var(--od-e)}
+.od-fill .od-w.od-w-on{color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  .od-fill,.od-fill .od-w{color:#fff}
+}
+
 /* ---------- 7. Selection + MENU weight ---------- */
 /* default browser blue reads as a bug on this canvas — use the brand accent */
 ::selection{background:var(--od-orange);color:#000;text-shadow:none}
