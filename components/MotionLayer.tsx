@@ -364,8 +364,12 @@ export default function MotionLayer() {
     const wire = D.querySelector<HTMLElement>(".project-line-wrap");
     if (wire) {
       let armed = true;
-      let prevY = scrollY;
-      const trackY = () => { prevY = scrollY; };
+      let lastY = scrollY;
+      let dir = 0;                       // must keep the DELTA, not the position:
+      const trackY = () => {             // storing only the last Y makes the
+        dir = scrollY - lastY;           // direction test always compare equal
+        lastY = scrollY;
+      };
       addEventListener("scroll", trackY, { passive: true });
 
       const glide = (toY: number) => {
@@ -397,7 +401,7 @@ export default function MotionLayer() {
           else {
             handoffActive = false;
             H.classList.remove("od-wire-handoff");
-            prevY = scrollY;
+            lastY = scrollY;
           }
         };
         requestAnimationFrame(step);
@@ -408,7 +412,7 @@ export default function MotionLayer() {
           entries.forEach((e) => {
             if (!e.isIntersecting) { armed = true; return; }   // re-arm on exit
             if (!armed || handoffActive) return;
-            if (scrollY <= prevY) return;                      // only travelling down
+            if (dir <= 0) return;                              // only travelling down
             const next = wire.closest("section")?.nextElementSibling as HTMLElement | null;
             if (!next) return;
             armed = false;
