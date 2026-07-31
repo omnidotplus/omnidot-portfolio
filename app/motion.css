@@ -379,6 +379,19 @@ html.od-intro-lock,html.od-intro-lock body{overflow:hidden}
   .team-right-content-wrap{
     display:grid!important;grid-template-columns:1fr;gap:24px}
   .service-bottom-content-wrap{display:block!important}
+
+  /* the whole projects grid was hidden here — this is why Featured Projects
+     was blank on a phone */
+  .project-right-content-wrap,.project-bottom-item-wrap{
+    display:grid!important;grid-template-columns:1fr;gap:20px}
+  .project-top-box{grid-template-columns:1fr;gap:20px}
+
+  /* the testimonial's left column (portrait + pull quote) was hidden too */
+  .testimonmial-left-content-wrap{display:block!important;margin-bottom:28px}
+  .testimonial-row{grid-template-columns:1fr;gap:24px}
+  .testimonial-right-bottom-item-wrap{grid-template-columns:1fr;gap:16px}
+  /* .testimonial-item.none stays hidden — showing 2 of 4 on a phone is a
+     deliberate density choice, not slider fallout */
 }
 
 @media screen and (max-width:991px){

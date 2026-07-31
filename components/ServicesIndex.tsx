@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { services } from "@/lib/content";
+import { services } from "../lib/content";
 
 /**
  * Services as an index list rather than a card row.
