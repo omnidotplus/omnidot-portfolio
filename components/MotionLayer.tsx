@@ -336,6 +336,93 @@ export default function MotionLayer() {
       cleanups.push(() => removeEventListener("mousemove", onMove));
     }
 
+    /* ---------- phone link: dial on a phone, jump to contact on a desktop ----------
+       A tel: link on a machine that cannot place calls either does nothing or
+       hands off to some unwanted app, so on a fine pointer it scrolls to the
+       contact section instead. */
+    const callLink = D.querySelector<HTMLAnchorElement>(".header-call-link");
+    if (callLink) {
+      const onCall = (e: MouseEvent) => {
+        if (!FINE) return;                    // touch device: let tel: dial
+        e.preventDefault();
+        const target = D.querySelector<HTMLElement>("#contact, .contact");
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+      if (FINE) {
+        callLink.setAttribute("aria-label", "Go to contact section");
+        callLink.setAttribute("title", "Get in touch");
+      }
+      callLink.addEventListener("click", onCall);
+      cleanups.push(() => callLink.removeEventListener("click", onCall));
+    }
+
+    /* ---------- transition wire: hand the reader to the next section ----------
+       Custom eased scroll rather than scrollIntoView, because that cannot be
+       cancelled — and any auto-scroll the reader can't override is hostile.
+       Aborts the moment they touch the wheel, a key, or the screen. */
+    let handoffActive = false;
+    const wire = D.querySelector<HTMLElement>(".project-line-wrap");
+    if (wire) {
+      let armed = true;
+      let prevY = scrollY;
+      const trackY = () => { prevY = scrollY; };
+      addEventListener("scroll", trackY, { passive: true });
+
+      const glide = (toY: number) => {
+        const fromY = scrollY;
+        const dist = toY - fromY;
+        if (Math.abs(dist) < 8) return;
+        const dur = Math.min(1100, 380 + Math.abs(dist) * 0.55);
+        const t0 = performance.now();
+        handoffActive = true;
+        H.classList.add("od-wire-handoff");
+
+        let cancelled = false;
+        const abort = () => { cancelled = true; };
+        // any deliberate input wins over the hand-off
+        addEventListener("wheel", abort, { passive: true, once: true });
+        addEventListener("touchstart", abort, { passive: true, once: true });
+        addEventListener("keydown", abort, { once: true });
+
+        const step = (t: number) => {
+          if (cancelled) {
+            handoffActive = false;
+            H.classList.remove("od-wire-handoff");
+            return;
+          }
+          const p = Math.min(1, (t - t0) / dur);
+          const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+          scrollTo(0, fromY + dist * e);
+          if (p < 1) requestAnimationFrame(step);
+          else {
+            handoffActive = false;
+            H.classList.remove("od-wire-handoff");
+            prevY = scrollY;
+          }
+        };
+        requestAnimationFrame(step);
+      };
+
+      const wireIO = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (!e.isIntersecting) { armed = true; return; }   // re-arm on exit
+            if (!armed || handoffActive) return;
+            if (scrollY <= prevY) return;                      // only travelling down
+            const next = wire.closest("section")?.nextElementSibling as HTMLElement | null;
+            if (!next) return;
+            armed = false;
+            glide(next.getBoundingClientRect().top + scrollY);
+          }),
+        { threshold: 0.55 }
+      );
+      wireIO.observe(wire);
+      cleanups.push(() => {
+        wireIO.disconnect();
+        removeEventListener("scroll", trackY);
+      });
+    }
+
     /* ---------- section magnetism ---------- */
     const secs = $("section[id]");
     if (secs.length > 1) {
@@ -343,7 +430,7 @@ export default function MotionLayer() {
       let animating = false;
       let lastY = scrollY;
       const onScroll = () => {
-        if (animating) return;
+        if (animating || handoffActive) return;   // the wire hand-off owns the scroll
         clearTimeout(idle);
         idle = setTimeout(() => {
           const dir = scrollY - lastY;

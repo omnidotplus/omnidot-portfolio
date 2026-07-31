@@ -227,13 +227,13 @@
   font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap;
   overflow:hidden;isolation:isolate;
   transition:transform 420ms var(--od-e),box-shadow 420ms var(--od-e)}
-.od-cta::before{                       /* deeper fill sweeps up from the base */
+.od-cta::before{                       /* white fill sweeps up from the base */
   content:"";position:absolute;inset:0;z-index:-1;
-  background:var(--od-orange-deep);
+  background:#fff;
   transform:translate3d(0,101%,0);
   transition:transform 460ms var(--od-e)}
 .od-cta:hover{transform:translate3d(0,-2px,0);
-  box-shadow:0 10px 26px rgba(241,40,2,.34)}
+  box-shadow:0 10px 26px rgba(255,255,255,.18)}
 .od-cta:hover::before{transform:translate3d(0,0,0)}
 .od-cta:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
@@ -274,6 +274,39 @@
 .od-nav-close:hover{background:var(--od-orange);border-color:var(--od-orange);
   color:#000;transform:rotate(90deg)}
 .od-nav-close:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* ---------- 6e. Section transition wire ----------
+   The band between Projects and Team was a pair of 1px rules at #0000001a —
+   invisible on this canvas, so it read as dead space. It now carries a pulse
+   that travels down the wire, and the motion layer hands the reader to the
+   next section when it comes into view. */
+.project-line-wrap{position:relative;overflow:hidden}
+.project-line-one{background-color:rgba(255,255,255,.10)!important}
+
+.od-anim .project-line-wrap::before,
+.od-anim .project-line-wrap::after{
+  content:"";position:absolute;left:50%;width:1px;height:26%;
+  margin-left:-1.5px;pointer-events:none;
+  background:linear-gradient(to bottom,
+    transparent 0%, var(--od-orange) 45%, #fff 62%, var(--od-orange) 78%, transparent 100%);
+  box-shadow:0 0 14px 1.5px rgba(241,94,38,.55);
+  animation:odWire 3.2s cubic-bezier(.5,0,.5,1) infinite}
+.od-anim .project-line-wrap::after{margin-left:1.5px;animation-delay:1.6s}
+
+@keyframes odWire{
+  0%   {top:-28%;opacity:0}
+  14%  {opacity:1}
+  86%  {opacity:1}
+  100% {top:100%;opacity:0}}
+
+/* while the hand-off runs, damp the pulse so two things aren't competing */
+.od-wire-handoff .project-line-wrap::before,
+.od-wire-handoff .project-line-wrap::after{opacity:.25;transition:opacity 240ms linear}
+
+@media (prefers-reduced-motion:reduce){
+  .od-anim .project-line-wrap::before,
+  .od-anim .project-line-wrap::after{animation:none;opacity:0}
+}
 
 /* ---------- 7. Selection + MENU weight ---------- */
 /* default browser blue reads as a bug on this canvas — use the brand accent */
