@@ -230,16 +230,23 @@ export default function MotionLayer() {
         };
         addEventListener("scroll", onScroll, { passive: true });
         addEventListener("resize", onScroll, { passive: true });
+        // paint() ran once at setup and then only on scroll — landing on a
+        // restored page without scrolling left every heading dim
         paint();
+        const ids = [requestAnimationFrame(paint), window.setTimeout(paint, 200),
+                     window.setTimeout(paint, 700), window.setTimeout(paint, 1400)];
         cleanups.push(() => {
           removeEventListener("scroll", onScroll);
           removeEventListener("resize", onScroll);
+          cancelAnimationFrame(ids[0]);
+          ids.slice(1).forEach((i) => clearTimeout(i));
         });
       }
     }
 
     /* ---------- metric counters ---------- */
     const counterIOs: IntersectionObserver[] = [];
+    const counterChecks: Array<() => void> = [];
     $(".project-bottom-h2,.testi-top-t").forEach((el) => {
       const raw = el.textContent?.replace(/ /g, " ").trim() ?? "";
       const m = raw.match(/^(\D*?)([\d.,]+)(.*)$/);
@@ -266,6 +273,14 @@ export default function MotionLayer() {
         frame = requestAnimationFrame(step);
       };
       render(0);
+      // geometry fallback: the observer's first callback is unreliable right
+      // after a navigation, which left these reading 0 until the user scrolled
+      let ran = false;
+      counterChecks.push(() => {
+        if (ran) return;
+        const r = el.getBoundingClientRect();
+        if (r.top < innerHeight * 0.9 && r.bottom > 0) { ran = true; run(); }
+      });
       const io = new IntersectionObserver(
         (entries) =>
           entries.forEach((e) => {
@@ -282,6 +297,17 @@ export default function MotionLayer() {
       cleanups.push(() => cancelAnimationFrame(frame));
     });
     cleanups.push(() => counterIOs.forEach((io) => io.disconnect()));
+    {
+      const sweep = () => counterChecks.forEach((fn) => fn());
+      const ids = [requestAnimationFrame(sweep), window.setTimeout(sweep, 200),
+                   window.setTimeout(sweep, 700), window.setTimeout(sweep, 1400)];
+      addEventListener("scroll", sweep, { passive: true });
+      cleanups.push(() => {
+        cancelAnimationFrame(ids[0]);
+        ids.slice(1).forEach((i) => clearTimeout(i));
+        removeEventListener("scroll", sweep);
+      });
+    }
 
     /* ---------- hero headline: per-letter cursor response ---------- */
     const h1 = D.querySelector<HTMLElement>(".hero-bottom-h1");

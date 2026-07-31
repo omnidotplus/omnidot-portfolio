@@ -8,7 +8,6 @@ import Testimonials from "../components/Testimonials";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import LineWrap from "../components/LineWrap";
-import MotionLayer from "../components/MotionLayer";
 
 export default function Page() {
   return (
@@ -31,7 +30,6 @@ export default function Page() {
         <Footer />
         <LineWrap />
       </div>
-      <MotionLayer />
     </>
   );
 }
