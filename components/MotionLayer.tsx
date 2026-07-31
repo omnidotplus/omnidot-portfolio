@@ -159,6 +159,14 @@ export default function MotionLayer() {
       heads.forEach((el) => {
         const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
         if (!text) return;
+        // capture the section's own text colour before .od-fill overrides it,
+        // so light sections fill to their dark ink rather than to white
+        const lit = getComputedStyle(el).color;
+        const dim = lit.startsWith("rgb(")
+          ? lit.replace("rgb(", "rgba(").replace(")", ", 0.26)")
+          : lit.replace(/[\d.]+\)$/, "0.26)");
+        el.style.setProperty("--od-lit", lit);
+        el.style.setProperty("--od-dim", dim);
         el.textContent = "";
         el.classList.add("od-fill");
         text.split(" ").forEach((word, i, arr) => {

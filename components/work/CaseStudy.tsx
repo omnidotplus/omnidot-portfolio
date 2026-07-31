@@ -23,7 +23,7 @@ export default function CaseStudy({ project }: { project: Project }) {
   return (
     <article className="od-cs">
       <header className="od-cs-head">
-        <Link href="/#project" className="od-cs-back">
+        <Link href="/" className="od-cs-back">
           <span aria-hidden="true">←</span> Work
         </Link>
 

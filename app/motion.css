@@ -400,29 +400,29 @@
 }
 
 /* ---------- 6f. Headings ----------
-   h2/h3 already resolved to Bebas via heading-font-five; h1 was the only one
-   still on Humane. Bebas is far wider per character than Humane, so the hero
-   display size has to come down or the line wraps. */
-:root{--_size---h1--font-family:var(--_typography---heading-font-five)}
-h1,h2,h3,h4,h5,h6,
-.hero-bottom-h1,.od-cs-title,.od-svc-name,.footer-header{
-  font-family:"Bebas Neue",sans-serif}
-
-.hero-bottom-h1{font-size:clamp(52px,13.2vw,196px)!important;line-height:.86!important}
+   h2/h3 already resolve to Bebas natively via heading-font-five, so "Bebas for
+   headers" needed no change there. h1 was the only thing an override touched —
+   and h1 is the two oversized display wordmarks (hero "CREATIVE AGENCY." and
+   the footer "OMNIDOT"), both sized around Humane's ultra-condensed metrics.
+   In Bebas they overflow their line. h1 therefore stays Humane. */
+.od-cs-title,.od-svc-name{font-family:"Bebas Neue",sans-serif}
 .od-cs-title{font-size:clamp(44px,8vw,132px);line-height:.88}
 
+/* the footer wordmark must never overflow, whatever the face */
+.footer-header{max-width:100%;overflow-wrap:break-word}
+
 /* ---------- 6g. Scroll-linked heading fill ----------
-   Headings start muted and fill to white word by word as they travel through
-   the viewport. This replaces the opacity reveal on these elements — running
-   both made the type look like it was fading twice. */
-.od-fill{color:rgba(255,255,255,.26)}
+   Words light from muted to full as the heading crosses the reading band.
+   The lit colour is read off the element itself rather than hardcoded — the
+   Projects section sits on a light background, where filling to white made
+   the heading unreadable. */
 .od-fill .od-w{
-  color:rgba(255,255,255,.26);
+  color:var(--od-dim,rgba(255,255,255,.26));
   transition:color 420ms var(--od-e)}
-.od-fill .od-w.od-w-on{color:#fff}
+.od-fill .od-w.od-w-on{color:var(--od-lit,#fff)}
 
 @media (prefers-reduced-motion:reduce){
-  .od-fill,.od-fill .od-w{color:#fff}
+  .od-fill .od-w{color:var(--od-lit,#fff)}
 }
 
 /* ---------- 7. Selection + MENU weight ---------- */
