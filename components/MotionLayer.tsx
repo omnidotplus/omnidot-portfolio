@@ -25,6 +25,12 @@ export default function MotionLayer() {
     H.classList.add("od-anim");
     const cleanups: Array<() => void> = [];
 
+    // a remount can inherit interaction classes left set when the page unmounted
+    ["od-card-hot", "od-svc-live", "od-orb-hot", "od-nav-open"].forEach((c) =>
+      D.querySelectorAll("." + c).forEach((el) => el.classList.remove(c))
+    );
+    H.classList.remove("od-nav-lock", "od-intro-lock");
+
     /* ---------- nav panel: open/close ----------
        The old runtime owned this; without it the panel sat open on every load. */
     const navBtn = D.querySelector<HTMLElement>(".header-menu-link");
@@ -112,10 +118,33 @@ export default function MotionLayer() {
         marked.push(el);
       })
     );
-    // reveal what is already on screen in the same tick, so nothing flashes
-    marked.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.top < innerHeight && r.bottom > 0) el.classList.add("od-in");
+    // Reveal whatever is on screen by geometry, not by waiting on the observer.
+    // On a client-side navigation back to this page the effect re-runs before
+    // layout has settled, so the observer's first callback can report
+    // "not intersecting" for elements that are plainly visible — they then sit
+    // at opacity 0 until you scroll or reload. Sweeping on our own terms, and
+    // repeating as images land, removes that dependency.
+    const settle = () => {
+      marked.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top < innerHeight && r.bottom > 0) {
+          el.classList.remove("od-out");
+          el.classList.add("od-in");
+        }
+      });
+    };
+    settle();
+    const sweeps = [
+      requestAnimationFrame(settle),
+      window.setTimeout(settle, 120),
+      window.setTimeout(settle, 500),
+      window.setTimeout(settle, 1200),
+    ];
+    addEventListener("load", settle);
+    cleanups.push(() => {
+      cancelAnimationFrame(sweeps[0]);
+      sweeps.slice(1).forEach((id) => clearTimeout(id));
+      removeEventListener("load", settle);
     });
 
     const revealIO = new IntersectionObserver(
@@ -146,7 +175,7 @@ export default function MotionLayer() {
           el.classList.add("od-in");
         }
       });
-    }, 4000);
+    }, 1500);
     cleanups.push(() => clearTimeout(failsafe));
 
 
