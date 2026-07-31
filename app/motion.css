@@ -1,0 +1,424 @@
+/* ============================================================
+   OMNIDOT MOTION + SERVICES INDEX  ·  v2
+   Reference lock:
+     primary   K72        — black canvas, oversized type, flat, ghost outlines
+     borrow    Pipe       — one molten orange, interaction ONLY
+     borrow    G. Faria   — services as an index list on 1px hairlines
+   ============================================================ */
+
+:root{
+  --od-e:cubic-bezier(.22,1,.36,1);
+  --od-n:640ms;
+  --od-orange:#f15e26;
+  --od-orange-deep:#f12802;
+  --od-hair:rgba(255,255,255,.16);
+  --od-muted:rgba(255,255,255,.46);
+  --od-mx:0px; --od-my:0px;
+}
+
+/* ---------- 1. REVEALS — repeatable, both directions ---------- */
+.od-anim [data-od-r]{
+  opacity:0;transform:translate3d(0,30px,0);
+  transition:opacity var(--od-n) var(--od-e) var(--od-d,0ms),
+             transform var(--od-n) var(--od-e) var(--od-d,0ms);
+  will-change:opacity,transform}
+.od-anim [data-od-r].od-in{opacity:1;transform:none}
+/* leaving upward gets a shorter, snappier exit so re-entry feels responsive */
+.od-anim [data-od-r].od-out{opacity:0;transform:translate3d(0,-18px,0);
+  transition-duration:380ms;transition-delay:0ms}
+
+/* ---------- 2. LOGO — force render, then breathe the dot ---------- */
+/* the source ships TWO wordmarks inside .header-logo-wrap; only the first is the header
+   logo, so the duplicate stays collapsed exactly as it was before this layer existed */
+.header-logo-wrap .header-wrapper:not(:first-of-type){display:none}
+
+.header-logo-wrap .header-wrapper:first-of-type .header-logo,
+.header-logo-wrap .header-wrapper:first-of-type .od-logo-svg{
+  display:block;width:clamp(104px,9vw,148px);height:auto}
+.footer-logo,.footer-logo-link .od-logo-svg{
+  display:block;width:clamp(120px,11vw,180px);height:auto}
+.header-logo-link,.footer-logo-link{display:inline-flex;align-items:center;width:auto}
+.od-anim .header-logo-wrap,.od-anim .footer-logo-link{
+  opacity:0;animation:odLogo 900ms var(--od-e) .2s forwards}
+@keyframes odLogo{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
+/* the "." is a <circle> in the wordmark — reachable once the SVG is inlined */
+.od-logo-svg{overflow:visible}
+/* the dot is only ~12px on screen, so it needs a decisive blink, not a gentle fade */
+.od-logo-svg circle{
+  transform-box:fill-box;transform-origin:center;
+  animation:odDot 1800ms steps(1,end) infinite}
+@keyframes odDot{
+  0%,  62% {opacity:1}
+  63%, 78% {opacity:0}
+  79%, 88% {opacity:1}
+  89%, 96% {opacity:0}
+  97%,100% {opacity:1}}
+
+/* ---------- 3. HERO HEADLINE — per-letter cursor response ---------- */
+.od-h1{display:inline-block}
+.od-h1 .od-ch{
+  display:inline-block;will-change:transform,color;
+  transition:transform 620ms var(--od-e),color 420ms var(--od-e),
+             opacity 420ms var(--od-e)}
+.od-h1 .od-ch.od-sp{width:.26em}
+.od-h1:hover .od-ch{opacity:.34}
+.od-h1 .od-ch.od-near{
+  opacity:1;color:var(--od-orange);
+  transform:translate3d(0,calc(var(--od-lift,0) * -1px),0) scale(calc(1 + var(--od-lift,0)/90))}
+
+/* ---------- 4. SERVICES — index list (replaces the card row) ---------- */
+.od-svc{position:relative;border-top:1px solid var(--od-hair)}
+.od-svc-bg{
+  position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  opacity:0;transition:opacity 620ms var(--od-e)}
+.od-svc.od-svc-live .od-svc-bg{opacity:1}
+.od-svc-bg img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transform:scale(1.08);
+  transition:opacity 700ms var(--od-e),transform 1400ms var(--od-e)}
+.od-svc-bg img.od-on{opacity:.22;transform:scale(1)}
+.od-svc-bg::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,#000 8%,rgba(0,0,0,.45) 55%,#000 100%)}
+
+.od-svc-row{
+  position:relative;z-index:1;display:grid;
+  grid-template-columns:auto minmax(0,1fr) minmax(0,.85fr) auto;
+  align-items:center;gap:clamp(16px,3vw,56px);
+  padding:clamp(22px,3.2vw,42px) clamp(16px,4vw,64px);
+  border-bottom:1px solid var(--od-hair);
+  text-decoration:none;cursor:pointer;
+  transition:background 520ms var(--od-e),padding-left 520ms var(--od-e)}
+.od-svc-row:hover{background:rgba(255,255,255,.028);padding-left:calc(clamp(16px,4vw,64px) + 14px)}
+
+.od-svc-num{
+  font-size:11px;letter-spacing:.16em;color:var(--od-muted);
+  font-variant-numeric:tabular-nums;transition:color 420ms var(--od-e)}
+.od-svc-row:hover .od-svc-num{color:var(--od-orange)}
+
+.od-svc-name{
+  margin:0;color:#fff;line-height:.92;text-transform:uppercase;
+  font-size:clamp(26px,4.6vw,68px);font-weight:400;
+  letter-spacing:-.01em;text-wrap:balance;
+  transition:transform 560ms var(--od-e)}
+.od-svc-row:hover .od-svc-name{transform:translate3d(6px,0,0)}
+
+.od-svc-tags{
+  display:flex;flex-wrap:wrap;gap:6px 14px;
+  font-size:12px;letter-spacing:.05em;color:var(--od-muted);
+  transition:color 420ms var(--od-e)}
+.od-svc-row:hover .od-svc-tags{color:rgba(255,255,255,.8)}
+.od-svc-tags span{white-space:nowrap}
+.od-svc-tags span+span::before{content:"·";margin-right:14px;opacity:.5}
+
+.od-svc-mark{
+  width:44px;height:44px;border-radius:50%;flex:none;
+  border:1px solid var(--od-hair);display:grid;place-items:center;
+  color:#fff;font-size:15px;
+  transition:transform 520ms var(--od-e),background 420ms var(--od-e),
+             border-color 420ms var(--od-e),color 420ms var(--od-e)}
+.od-svc-row:hover .od-svc-mark{
+  background:var(--od-orange);border-color:var(--od-orange);color:#000;
+  transform:rotate(45deg) scale(1.06)}
+
+@media (max-width:860px){
+  .od-svc-row{grid-template-columns:auto minmax(0,1fr);gap:10px 18px}
+  .od-svc-tags{grid-column:1/-1}
+  .od-svc-mark{display:none}
+}
+
+/* ---------- 5. PROJECTS — cursor-following x-ray puck ---------- */
+.project-left-bottom-content-wrap,.project-left-bottom-content-wrap-02,
+.project-right-bottom-content-wrap-02,.project-right-bottom-content-wrap-03{
+  position:relative;overflow:hidden;cursor:none}
+.project-left-bottom-content-wrap img,.project-left-bottom-content-wrap-02 img,
+.project-right-bottom-content-wrap-02 img,.project-right-bottom-content-wrap-03 img{
+  transition:transform 900ms var(--od-e),filter 460ms var(--od-e);
+  will-change:transform,filter}
+.od-card-hot img{transform:scale(1.06);filter:brightness(.38) saturate(.7) contrast(1.05)}
+
+/* the puck rides the cursor inside the card */
+.od-puck{
+  position:absolute;z-index:6;top:0;left:0;width:112px;height:112px;
+  margin:-56px 0 0 -56px;border-radius:50%;pointer-events:none;
+  display:grid;place-items:center;text-align:center;
+  font-size:10px;line-height:1.3;letter-spacing:.09em;
+  text-transform:uppercase;font-weight:600;color:#000;
+  background:var(--od-orange);
+  opacity:0;transform:scale(.4);
+  transition:opacity 280ms var(--od-e),transform 420ms var(--od-e);
+  will-change:transform,opacity}
+.od-card-hot .od-puck{opacity:1;transform:scale(1)}
+
+/* ---------- 6. Other lifts ---------- */
+.team-item-right img{transition:transform 760ms var(--od-e),filter 460ms var(--od-e)}
+.team-item-right:hover img{transform:scale(1.07)}
+.testimonial-item{transition:transform 460ms var(--od-e)}
+.testimonial-item:hover{transform:translate3d(0,-6px,0)}
+
+/* the About ellipse — the orb */
+.about-shap-img-2{transition:transform 640ms var(--od-e),filter 520ms var(--od-e);
+  will-change:transform,filter}
+.od-anim .about-shap-img-2{animation:odOrb 6.5s ease-in-out infinite}
+@keyframes odOrb{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.about-shap-img-2.od-orb-hot{
+  animation-play-state:paused;
+  transform:translate3d(calc(var(--od-mx)*.05),calc(var(--od-my)*.05),0) scale(1.13);
+  filter:brightness(1.22) saturate(1.4) hue-rotate(-12deg)}
+
+.od-anim .hero-shap-img,.od-anim .footer-shap-img{animation:odFloat 11s ease-in-out infinite}
+@keyframes odFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-14px,0)}}
+
+/* links */
+.header-menu-link,.menu-link,.contact-header-email-t,
+.contact-header-number-t,.footer-right-t,.footer-right-t-2{position:relative;text-decoration:none}
+.header-menu-link::after,.menu-link::after,.contact-header-email-t::after,
+.contact-header-number-t::after,.footer-right-t::after,.footer-right-t-2::after{
+  content:"";position:absolute;left:0;bottom:-.14em;height:1px;width:100%;
+  background:currentColor;transform:scaleX(0);transform-origin:right;
+  transition:transform 420ms var(--od-e)}
+.header-menu-link:hover::after,.menu-link:hover::after,
+.contact-header-email-t:hover::after,.contact-header-number-t:hover::after,
+.footer-right-t:hover::after,.footer-right-t-2:hover::after{
+  transform:scaleX(1);transform-origin:left}
+
+.contact-left-bottom-icon-link{display:inline-block;transition:transform 380ms var(--od-e)}
+.contact-left-bottom-icon-link:hover{transform:translate3d(0,-4px,0) rotate(-7deg)}
+
+/* cursor-reactive headlines */
+.footer-header,.footer-text,.footer-bottom-text,.contact-h2{
+  transition:transform 700ms var(--od-e);will-change:transform}
+.od-cursor-text{transform:perspective(760px)
+  rotateX(calc(var(--od-my)*-.014deg)) rotateY(calc(var(--od-mx)*.018deg))
+  translate3d(calc(var(--od-mx)*.012px),calc(var(--od-my)*.012px),0)}
+
+/* ---------- 6b. Nav panel ----------
+   The old runtime opened and closed this. With that gone the panel defaulted to
+   open on every load, so it is closed here and driven by the motion layer. */
+.header-menu-wrap{
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translate3d(0,-10px,0);
+  transition:opacity 300ms var(--od-e),transform 420ms var(--od-e),visibility 0s 300ms}
+.header-menu-wrap.od-nav-open{
+  opacity:1;visibility:visible;pointer-events:auto;
+  transform:none;transition-delay:0s,0s,0s}
+.header-menu-wrap .menu-link{
+  opacity:0;transform:translate3d(0,10px,0);
+  transition:opacity 420ms var(--od-e),transform 420ms var(--od-e)}
+.header-menu-wrap.od-nav-open .menu-link{opacity:1;transform:none}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(1){transition-delay:60ms}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(2){transition-delay:105ms}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(3){transition-delay:150ms}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(4){transition-delay:195ms}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(5){transition-delay:240ms}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(6){transition-delay:285ms}
+.header-menu-wrap.od-nav-open .menu-link:nth-child(7){transition-delay:330ms}
+.header-menu-link{cursor:pointer}
+
+/* ---------- 7. Selection + MENU weight ---------- */
+/* default browser blue reads as a bug on this canvas — use the brand accent */
+::selection{background:var(--od-orange);color:#000;text-shadow:none}
+::-moz-selection{background:var(--od-orange);color:#000;text-shadow:none}
+
+.header-menu-link,.header-row .menu-link,.heading-menu-box .menu-link{
+  font-weight:700;letter-spacing:.1em}
+
+/* ---------- 7b. Intro — the wordmark resolves, then lifts away ---------- */
+.od-intro{
+  position:fixed;inset:0;z-index:99999;background:#000;
+  display:grid;place-items:center;
+  transition:transform 900ms var(--od-e),opacity 620ms var(--od-e)}
+.od-intro-mark{width:min(38vw,420px);height:auto;overflow:visible}
+/* wordmark wipes up out of nothing */
+.od-intro-mark .od-intro-word{
+  clip-path:inset(100% 0 0 0);
+  animation:odWipe 1100ms var(--od-e) 160ms forwards}
+@keyframes odWipe{to{clip-path:inset(0 0 0 0)}}
+/* the dot lands last, then keeps its pulse */
+.od-intro-mark circle{
+  transform-box:fill-box;transform-origin:center;
+  opacity:0;transform:scale(.2);
+  animation:odDotIn 620ms var(--od-e) 1050ms forwards,
+            odDot 2400ms var(--od-e) 1700ms infinite}
+@keyframes odDotIn{to{opacity:1;transform:scale(1)}}
+.od-intro.od-intro-out{transform:translate3d(0,-100%,0);opacity:.6}
+html.od-intro-lock,html.od-intro-lock body{overflow:hidden}
+
+/* ---------- 7c. Platform badge removal ---------- */
+.w-webflow-badge,[class*="w-webflow-badge"]{display:none!important}
+
+/* ============================================================
+   7d. Top bloom
+   The captions.ai header mechanic rebuilt for a dark canvas: a light wash
+   pinned to the top that dissolves into the page.
+
+   The colours must TRAVEL, not just move. CSS cannot tween a colour written
+   literally inside radial-gradient() — the gradient is parsed as an image and
+   the value is frozen. Registering the slots with @property makes them real
+   interpolatable colours, which is the whole trick.
+
+   Palette is sampled from the artwork this replaces: the hero streaks ran an
+   amber (~30deg) against a green (~75-105deg), plus the logo orange.
+   ============================================================ */
+@property --od-c1 { syntax: "<color>"; inherits: false; initial-value: #ff5b1f; }
+@property --od-c2 { syntax: "<color>"; inherits: false; initial-value: #ffa62b; }
+@property --od-c3 { syntax: "<color>"; inherits: false; initial-value: #57c33d; }
+@property --od-c4 { syntax: "<color>"; inherits: false; initial-value: #17a8a0; }
+
+/* .header is z-index:11 and .hero is z-index:2 in the export, but neither is
+   positioned — so those values did nothing and the bloom painted over the logo. */
+.header{position:relative}
+.hero{position:relative}
+
+/* the bloom is now the hero's only light source */
+.hero-shap-img-wrap{display:none}
+
+.od-bloom{
+  position:absolute;top:0;left:0;right:0;height:85vh;
+  z-index:3;pointer-events:none;overflow:hidden;
+  contain:paint;
+  mix-blend-mode:screen;                       /* additive: lightens, never darkens */
+  -webkit-mask-image:linear-gradient(to bottom,
+    #000 0%, #000 26%, rgba(0,0,0,.66) 52%, rgba(0,0,0,.26) 76%, transparent 100%);
+  mask-image:linear-gradient(to bottom,
+    #000 0%, #000 26%, rgba(0,0,0,.66) 52%, rgba(0,0,0,.26) 76%, transparent 100%);
+}
+
+.od-blob{
+  position:absolute;display:block;border-radius:50%;
+  filter:blur(72px);                            /* static — never animate blur */
+  will-change:transform,opacity;
+}
+
+/* Motion and colour run on separate timelines with different periods, so the
+   two never resync and the overlaps keep producing new mixes. */
+.od-blob-a{
+  width:64vw;height:64vh;left:-16vw;top:-26vh;
+  background:radial-gradient(circle at 50% 50%,
+    var(--od-c1) 0%, color-mix(in oklab, var(--od-c1) 35%, transparent) 46%, transparent 72%);
+  opacity:.62;
+  animation:odFlowA 17s ease-in-out infinite, odHueA 16s linear infinite;
+}
+.od-blob-b{
+  width:56vw;height:56vh;left:16vw;top:-30vh;
+  background:radial-gradient(circle at 50% 50%,
+    var(--od-c2) 0%, color-mix(in oklab, var(--od-c2) 32%, transparent) 48%, transparent 74%);
+  opacity:.5;
+  animation:odFlowB 23s ease-in-out infinite, odHueB 19s linear infinite;
+}
+.od-blob-c{
+  width:68vw;height:62vh;left:42vw;top:-24vh;
+  background:radial-gradient(circle at 50% 50%,
+    var(--od-c3) 0%, color-mix(in oklab, var(--od-c3) 34%, transparent) 46%, transparent 73%);
+  opacity:.56;
+  animation:odFlowC 29s ease-in-out infinite, odHueC 21s linear infinite;
+}
+.od-blob-d{
+  width:50vw;height:54vh;left:68vw;top:-28vh;
+  background:radial-gradient(circle at 50% 50%,
+    var(--od-c4) 0%, color-mix(in oklab, var(--od-c4) 30%, transparent) 50%, transparent 75%);
+  opacity:.46;
+  animation:odFlowD 37s ease-in-out infinite, odHueD 18s linear infinite;
+}
+
+/* Each slot walks the same four-stop loop, entered at a different offset, so no
+   two blobs ever hold the same hue. */
+@keyframes odHueA{
+  0%,100%{--od-c1:#ff5b1f} 25%{--od-c1:#ffa62b}
+  50%    {--od-c1:#57c33d} 75%{--od-c1:#17a8a0}
+}
+@keyframes odHueB{
+  0%,100%{--od-c2:#ffa62b} 25%{--od-c2:#57c33d}
+  50%    {--od-c2:#17a8a0} 75%{--od-c2:#ff5b1f}
+}
+@keyframes odHueC{
+  0%,100%{--od-c3:#57c33d} 25%{--od-c3:#17a8a0}
+  50%    {--od-c3:#ff5b1f} 75%{--od-c3:#ffa62b}
+}
+@keyframes odHueD{
+  0%,100%{--od-c4:#17a8a0} 25%{--od-c4:#ff5b1f}
+  50%    {--od-c4:#ffa62b} 75%{--od-c4:#57c33d}
+}
+
+@keyframes odFlowA{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  30%    {transform:translate3d(24vw,7vh,0) scale(1.28)}
+  60%    {transform:translate3d(9vw,-5vh,0) scale(.88)}
+}
+@keyframes odFlowB{
+  0%,100%{transform:translate3d(0,0,0) scale(1.1)}
+  35%    {transform:translate3d(-22vw,9vh,0) scale(.84)}
+  70%    {transform:translate3d(15vw,3vh,0) scale(1.32)}
+}
+@keyframes odFlowC{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  40%    {transform:translate3d(-28vw,6vh,0) scale(1.22)}
+  75%    {transform:translate3d(-11vw,-7vh,0) scale(.94)}
+}
+@keyframes odFlowD{
+  0%,100%{transform:translate3d(0,0,0) scale(1.05)}
+  45%    {transform:translate3d(-32vw,11vh,0) scale(1.34)}
+  80%    {transform:translate3d(-7vw,-4vh,0) scale(.9)}
+}
+
+@media (max-width:767px){
+  .od-bloom{height:56vh}
+  .od-blob{filter:blur(46px)}        /* wide blur radii are expensive on mobile GPUs */
+  .od-blob-d{display:none}           /* three blobs is plenty at this width */
+}
+@media (prefers-reduced-motion:reduce){
+  .od-blob{animation:none}           /* holds the first frame, still a static wash */
+}
+
+/* ============================================================
+   8. Responsive repair
+   The export hid the static grids on small screens because Webflow sliders
+   took over there. Those sliders are gone, so the grids have to come back —
+   otherwise Team and Services are simply empty on a phone.
+   ============================================================ */
+@media screen and (max-width:479px){
+  .team-right-content-wrap{
+    display:grid!important;grid-template-columns:1fr;gap:24px}
+  .service-bottom-content-wrap{display:block!important}
+}
+
+@media screen and (max-width:991px){
+  /* projects: stop the two columns fighting for width */
+  .project-top-box,.project-left-content-wrap,.project-right-content-wrap{
+    grid-template-columns:1fr}
+  .project-bottom-item-wrap{grid-template-columns:1fr;gap:20px}
+  /* the cursor puck is meaningless without a cursor */
+  .od-puck{display:none}
+  .project-left-bottom-content-wrap,.project-left-bottom-content-wrap-02,
+  .project-right-bottom-content-wrap-02,.project-right-bottom-content-wrap-03{
+    cursor:pointer}
+  .od-card-hot img{transform:none;filter:none}
+}
+
+@media screen and (max-width:767px){
+  .team-right-content-wrap{grid-template-columns:1fr 1fr;gap:20px}
+  .testimonial-right-bottom-item-wrap{grid-template-columns:1fr}
+  /* headline letters must not be individually laid out on a narrow column */
+  .od-h1 .od-ch{display:inline}
+  .od-h1 .od-ch.od-sp{width:auto}
+}
+
+/* nav panel goes full-height on a phone so the links are reachable */
+@media screen and (max-width:767px){
+  .header-menu-wrap.od-nav-open{
+    position:fixed;inset:0;z-index:9000;
+    display:flex;flex-direction:column;justify-content:center;
+    background:#0b0b0b;padding:24px}
+  html.od-nav-lock,html.od-nav-lock body{overflow:hidden}
+}
+
+/* ---------- 9. Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  .od-anim [data-od-r],.od-anim [data-od-r].od-out{
+    opacity:1!important;transform:none!important}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .od-puck{display:none}
+  .project-left-bottom-content-wrap,.project-left-bottom-content-wrap-02,
+  .project-right-bottom-content-wrap-02,.project-right-bottom-content-wrap-03{cursor:pointer}
+}
