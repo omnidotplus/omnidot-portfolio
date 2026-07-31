@@ -8,13 +8,11 @@ import Testimonials from "../components/Testimonials";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import LineWrap from "../components/LineWrap";
-import Intro from "../components/Intro";
 import MotionLayer from "../components/MotionLayer";
 
 export default function Page() {
   return (
     <>
-      <Intro />
       <div className="page-wrapper">
         <div className="od-bloom" aria-hidden="true">
           <span className="od-blob od-blob-a" />

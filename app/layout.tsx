@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import RouteIntro from "../components/RouteIntro";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://omnidot.com"),
@@ -41,7 +42,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="body-2">{children}</body>
+      <body className="body-2">
+        <RouteIntro />
+        {children}
+      </body>
     </html>
   );
 }

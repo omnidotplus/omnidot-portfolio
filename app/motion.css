@@ -399,6 +399,18 @@
   .od-cs-panel-scroll{overflow:visible;max-height:none}
 }
 
+/* ---------- 6f. Headings ----------
+   h2/h3 already resolved to Bebas via heading-font-five; h1 was the only one
+   still on Humane. Bebas is far wider per character than Humane, so the hero
+   display size has to come down or the line wraps. */
+:root{--_size---h1--font-family:var(--_typography---heading-font-five)}
+h1,h2,h3,h4,h5,h6,
+.hero-bottom-h1,.od-cs-title,.od-svc-name,.footer-header{
+  font-family:"Bebas Neue",sans-serif}
+
+.hero-bottom-h1{font-size:clamp(52px,13.2vw,196px)!important;line-height:.86!important}
+.od-cs-title{font-size:clamp(44px,8vw,132px);line-height:.88}
+
 /* ---------- 7. Selection + MENU weight ---------- */
 /* default browser blue reads as a bug on this canvas — use the brand accent */
 ::selection{background:var(--od-orange);color:#000;text-shadow:none}
