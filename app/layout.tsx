@@ -6,10 +6,9 @@ export const metadata: Metadata = {
   title: "Omnidot — Creative Digital Agency",
   description:
     "Creative agency specialising in web design, branding and digital development. Trusted by 1k+ clients, rated 4.9/5.",
-  icons: {
-    icon: "/assets/6a5e950d52478c467739fe24_favicon.png",
-    apple: "/assets/6a5e950d52478c467739fe25_favicon-256.png",
-  },
+  // No `icons` key on purpose: an explicit declaration overrides Next's
+  // file convention, and app/icon.svg (the orange O and dot) is the mark we want.
+  // Declaring the old template PNGs here silently won out over it.
   openGraph: {
     title: "Omnidot — Creative Digital Agency",
     description:

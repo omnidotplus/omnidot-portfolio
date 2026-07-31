@@ -30,11 +30,29 @@ export default function MotionLayer() {
     const navBtn = D.querySelector<HTMLElement>(".header-menu-link");
     const navPanel = D.querySelector<HTMLElement>(".header-menu-wrap");
     if (navBtn && navPanel) {
+      // the panel shipped with no way out once the old runtime was removed
+      let closeBtn = navPanel.querySelector<HTMLElement>(".od-nav-close");
+      if (!closeBtn) {
+        closeBtn = D.createElement("button");
+        closeBtn.className = "od-nav-close";
+        closeBtn.setAttribute("type", "button");   // .type needs HTMLButtonElement typing
+        closeBtn.setAttribute("aria-label", "Close menu");
+        closeBtn.textContent = "✕";
+        navPanel.appendChild(closeBtn);
+      }
+
       const setOpen = (open: boolean) => {
         navPanel.classList.toggle("od-nav-open", open);
         navBtn.setAttribute("aria-expanded", String(open));
         H.classList.toggle("od-nav-lock", open);
+        if (open) closeBtn!.focus();
       };
+      const onClose = (e: Event) => {
+        e.stopPropagation();
+        setOpen(false);
+      };
+      closeBtn.addEventListener("click", onClose);
+      cleanups.push(() => closeBtn!.removeEventListener("click", onClose));
       navBtn.setAttribute("role", "button");
       navBtn.setAttribute("aria-expanded", "false");
       navBtn.setAttribute("aria-controls", "od-nav");
@@ -70,6 +88,10 @@ export default function MotionLayer() {
 
     /* ---------- reveals: repeatable in AND out ---------- */
     const GROUPS = [
+      // section eyebrows ("/ / / / OUR TEAM") and their headings — these were
+      // never in the list, so they appeared once and then sat static
+      ".about-t,.service-top-left-text,.project-t,.team-top-text,.testi-t,.contact-t",
+      ".about-h2,.team-top-h2,.contact-h2,.project-top-h2,.testimonial-h2",
       ".hero-text-wrap,.hero-fast-text,.hero-bottom-text,.hero-right-img-content-wrap",
       ".about-left-content-wrap,.about-right-content-wrap",
       ".od-svc-row",

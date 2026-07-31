@@ -214,6 +214,67 @@
 .header-menu-wrap.od-nav-open .menu-link:nth-child(7){transition-delay:330ms}
 .header-menu-link{cursor:pointer}
 
+/* ---------- 6c. Header CTA ----------
+   Reference lock resolution: K72 (primary) uses ghost pills for actions, but
+   Pipe reserves the molten orange for the primary CTA specifically — and
+   ThoughtLab / Metaview both make the top-nav CTA the single coloured element
+   on a dark canvas. Using it exactly once satisfies both. Label is black:
+   Pipe flags white-on-orange at only 5.6:1. */
+.od-cta{
+  position:relative;display:inline-flex;align-items:center;gap:10px;
+  padding:11px 14px 11px 20px;border-radius:999px;
+  background:var(--od-orange);color:#000;text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap;
+  overflow:hidden;isolation:isolate;
+  transition:transform 420ms var(--od-e),box-shadow 420ms var(--od-e)}
+.od-cta::before{                       /* deeper fill sweeps up from the base */
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:var(--od-orange-deep);
+  transform:translate3d(0,101%,0);
+  transition:transform 460ms var(--od-e)}
+.od-cta:hover{transform:translate3d(0,-2px,0);
+  box-shadow:0 10px 26px rgba(241,40,2,.34)}
+.od-cta:hover::before{transform:translate3d(0,0,0)}
+.od-cta:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* the label rolls: the visible copy leaves upward as its twin arrives.
+   flex-shrink must be off — the twin is absolutely positioned so it adds no
+   width, and the container was being squeezed below its content ("Book a ca"). */
+.od-cta{flex:none}
+.od-cta-roll{position:relative;display:block;overflow:hidden;line-height:1.25;
+  flex:none;min-width:max-content;white-space:nowrap}
+.od-cta-roll span{display:block;white-space:nowrap;
+  transition:transform 460ms var(--od-e)}
+.od-cta-roll span:last-child{position:absolute;inset:0;transform:translate3d(0,110%,0)}
+.od-cta:hover .od-cta-roll span:first-child{transform:translate3d(0,-110%,0)}
+.od-cta:hover .od-cta-roll span:last-child{transform:translate3d(0,0,0)}
+
+/* mark echoes the services row: same 45deg rotation, so the page has one
+   consistent hover vocabulary rather than a new idea per component */
+.od-cta-mark{
+  display:grid;place-items:center;width:26px;height:26px;flex:none;
+  border-radius:50%;background:rgba(0,0,0,.16);font-size:12px;
+  transition:transform 460ms var(--od-e),background 420ms var(--od-e)}
+.od-cta:hover .od-cta-mark{transform:rotate(45deg);background:rgba(0,0,0,.28)}
+
+@media (max-width:991px){ .od-cta{padding:9px 12px 9px 16px;font-size:12px} }
+@media (max-width:600px){ .od-cta{display:none} }   /* nav panel carries it there */
+
+/* ---------- 6d. Nav close button ----------
+   The panel had no way out on a phone once the runtime that owned it was gone. */
+.od-nav-close{
+  position:absolute;top:18px;right:18px;z-index:10;
+  width:44px;height:44px;border-radius:50%;
+  display:none;place-items:center;
+  background:transparent;border:1px solid var(--od-hair);
+  color:#fff;font-size:20px;line-height:1;cursor:pointer;
+  transition:transform 380ms var(--od-e),background 320ms var(--od-e),
+             border-color 320ms var(--od-e)}
+.header-menu-wrap.od-nav-open .od-nav-close{display:grid}
+.od-nav-close:hover{background:var(--od-orange);border-color:var(--od-orange);
+  color:#000;transform:rotate(90deg)}
+.od-nav-close:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
 /* ---------- 7. Selection + MENU weight ---------- */
 /* default browser blue reads as a bug on this canvas — use the brand accent */
 ::selection{background:var(--od-orange);color:#000;text-shadow:none}
