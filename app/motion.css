@@ -65,7 +65,12 @@
 /* a fixed .26em space is 130px at 500px type, which pushed the line over
    the container and forced a wrap. Render a real space instead. */
 .od-h1 .od-ch.od-sp{width:auto;white-space:pre}
-.od-h1:hover .od-ch{opacity:.34}
+/* touch has no mouseleave to clear :hover — without this guard, tapping the
+   headline latches every letter at .34 opacity until something else is
+   tapped, which reads as the whole headline being grey */
+@media (hover:hover) and (pointer:fine){
+  .od-h1:hover .od-ch{opacity:.34}
+}
 .od-h1 .od-ch.od-near{
   opacity:1;color:var(--od-orange);
   transform:translate3d(0,calc(var(--od-lift,0) * -1px),0) scale(calc(1 + var(--od-lift,0)/90))}

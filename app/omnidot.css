@@ -5562,9 +5562,14 @@ p {
     top: 9%;
   }
 
-  .footer-shap-img-wrap, .hero-shap-img-wrap {
+  .footer-shap-img-wrap {
     display: none;
   }
+
+  /* hero-shap-img-wrap used to be hidden here too, but its width is already
+     a responsive 100% of .hero — hiding it left the mobile hero as bare text
+     with nothing to anchor it, while About's own shape stayed visible right
+     at its top edge, so About read as bleeding into an empty hero above it */
 
   .page-wrapper {
     overflow: hidden;
