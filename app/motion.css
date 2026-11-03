@@ -646,3 +646,12 @@ html.od-intro-lock,html.od-intro-lock body{overflow:hidden}
   .project-left-bottom-content-wrap,.project-left-bottom-content-wrap-02,
   .project-right-bottom-content-wrap-02,.project-right-bottom-content-wrap-03{cursor:pointer}
 }
+
+/* ---------- testimonial portrait: crossfade to the current speaker ---------- */
+.od-testi-portrait{
+  transition:opacity 200ms ease,transform 200ms ease;
+  will-change:opacity,transform}
+.od-testi-portrait.od-testi-swapping{opacity:0;transform:translate3d(0,10px,0)}
+@media (prefers-reduced-motion:reduce){
+  .od-testi-portrait{transition:none}
+  .od-testi-portrait.od-testi-swapping{opacity:1;transform:none}}

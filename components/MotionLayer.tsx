@@ -112,9 +112,17 @@ export default function MotionLayer() {
     const marked: HTMLElement[] = [];
     GROUPS.forEach((sel) =>
       $(sel).forEach((el, i) => {
-        if (el.hasAttribute("data-od-r")) return;
-        el.setAttribute("data-od-r", "");
-        el.style.setProperty("--od-d", `${Math.min(i, 6) * 80}ms`);
+        // Mark once, but ALWAYS collect. Returning early for an
+        // already-marked node used to drop it from `marked` entirely, so it
+        // got no observer, no geometry sweep and no failsafe — if such a node
+        // survived a navigation it stayed at opacity 0 with nothing left in
+        // the system able to reveal it, and only a reload brought it back.
+        if (!el.hasAttribute("data-od-r")) {
+          el.setAttribute("data-od-r", "");
+          el.style.setProperty("--od-d", `${Math.min(i, 6) * 80}ms`);
+        }
+        // a stale exit state inherited from the previous mount reads as blank
+        el.classList.remove("od-out");
         marked.push(el);
       })
     );
@@ -171,7 +179,11 @@ export default function MotionLayer() {
     // after 4s it is shown regardless — a missing animation beats missing content.
     const failsafe = setTimeout(() => {
       marked.forEach((el) => {
-        if (!el.classList.contains("od-in") && !el.classList.contains("od-out")) {
+        // `od-out` is also a hidden state, so it has to be rescued here too.
+        // Exempting it meant anything the observer had pushed out of frame
+        // before a navigation stayed invisible for good.
+        if (!el.classList.contains("od-in")) {
+          el.classList.remove("od-out");
           el.classList.add("od-in");
         }
       });
@@ -518,6 +530,71 @@ export default function MotionLayer() {
       });
     }
 
+    /* ---------- testimonials: the portrait follows the quote ----------
+       The left image is sticky, so one stock face used to sit there while
+       four different people's quotes scrolled past it. It now crossfades to
+       whoever is currently being read. */
+    {
+      const portrait = D.querySelector<HTMLImageElement>(".testi-img");
+      const items = $(".testimonial-item");
+      if (portrait && items.length) {
+        const faces = items.map(
+          (it) => it.querySelector<HTMLImageElement>(".testi-item-img")?.src ?? ""
+        );
+        // decode ahead of the swap so the crossfade never lands on a blank frame
+        faces.forEach((src) => {
+          if (src) new Image().src = src;
+        });
+
+        const original = portrait.src;
+        portrait.classList.add("od-testi-portrait");
+        let active = -1;
+        let swap: ReturnType<typeof setTimeout>;
+
+        const show = (i: number) => {
+          if (i === active || !faces[i]) return;
+          active = i;
+          portrait.classList.add("od-testi-swapping");
+          clearTimeout(swap);
+          swap = setTimeout(() => {
+            portrait.src = faces[i];
+            portrait.classList.remove("od-testi-swapping");
+          }, 200);
+        };
+
+        let pending = false;
+        const pick = () => {
+          pending = false;
+          const mid = innerHeight / 2;
+          let best = -1;
+          let bestD = Infinity;
+          items.forEach((it, i) => {
+            const r = it.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > innerHeight) return;
+            const d = Math.abs(r.top + r.height / 2 - mid);
+            if (d < bestD) {
+              bestD = d;
+              best = i;
+            }
+          });
+          if (best >= 0) show(best);
+        };
+        const onScroll = () => {
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(pick);
+        };
+        addEventListener("scroll", onScroll, { passive: true });
+        pick();
+        cleanups.push(() => {
+          removeEventListener("scroll", onScroll);
+          clearTimeout(swap);
+          portrait.src = original;
+          portrait.classList.remove("od-testi-portrait", "od-testi-swapping");
+        });
+      }
+    }
+
     /* ---------- hero parallax ---------- */
     const heroImg = D.querySelector<HTMLElement>(".hero-right-img-content-wrap");
     if (heroImg) {
@@ -536,6 +613,14 @@ export default function MotionLayer() {
 
     return () => {
       cleanups.forEach((fn) => fn());
+      // Hand the DOM back in a neutral state. Anything left behind here is
+      // inherited by the next mount, and every hidden-state leftover
+      // (`od-out`, a stale parallax offset) reads as broken content.
+      marked.forEach((el) => {
+        el.classList.remove("od-in", "od-out");
+        el.removeAttribute("data-od-r");
+      });
+      if (heroImg) heroImg.style.transform = "";
       H.classList.remove("od-anim");
     };
   }, []);
