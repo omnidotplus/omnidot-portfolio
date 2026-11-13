@@ -1,0 +1,116 @@
+/* Project-intake forms (/contact/website, /contact/brand) and the
+   post-submit /contact/thanks page. Mirrors the /work index page's visual
+   vocabulary (Bebas Neue titles, #c2c2c2 body, --od-orange accent) rather
+   than reaching back into the legacy Webflow tokens. */
+
+.od-form-page{max-width:760px;margin:0 auto;padding:clamp(28px,4vw,64px)}
+
+.od-form-head{padding:clamp(24px,6vh,72px) 0 clamp(20px,4vh,36px)}
+.od-form-title{margin:clamp(20px,4vh,40px) 0 0;color:#fff;line-height:.9;
+  font-family:"Bebas Neue",sans-serif;font-size:clamp(44px,8vw,96px)}
+.od-form-sub{margin:clamp(14px,2vh,22px) 0 0;max-width:60ch;color:#c2c2c2;
+  font-size:clamp(16px,1.3vw,19px);line-height:1.55}
+
+.od-form{display:flex;flex-direction:column;gap:clamp(30px,4.5vh,44px);
+  padding-bottom:clamp(48px,8vh,96px)}
+
+/* a plain text/email/textarea/file field */
+.od-form-field{display:flex;flex-direction:column;gap:11px}
+.od-form-field-label{color:#fff;font-size:16px;letter-spacing:.01em}
+.od-form-req{color:var(--od-orange)}
+
+.od-form-input,.od-form-textarea{
+  background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.16);
+  color:#fff;font-family:inherit;font-size:16px;padding:10px 2px;
+  transition:border-color .2s ease}
+.od-form-input:hover,.od-form-textarea:hover,
+.od-form-input:focus,.od-form-textarea:focus{border-bottom-color:var(--od-orange)}
+.od-form-input:focus,.od-form-textarea:focus,
+.od-form-file input:focus-visible{outline:2px solid var(--od-orange);outline-offset:3px}
+.od-form-textarea{resize:vertical;min-height:110px}
+.od-form-input::placeholder,.od-form-textarea::placeholder{color:#6b6b6b}
+
+.od-form-file{display:flex;flex-direction:column;gap:8px}
+.od-form-file input[type="file"]{
+  color:#c2c2c2;font-size:14px;
+  border:1px dashed rgba(255,255,255,.22);border-radius:10px;padding:14px}
+
+/* radio / checkbox groups, with an optional CSS-only "Other" reveal */
+.od-form-group{border:none;margin:0;padding:0;display:flex;flex-direction:column;gap:15px}
+.od-form-legend{color:#fff;font-size:16px;padding:0}
+.od-form-hint{margin:-7px 0 0;color:#9a9a9a;font-size:14px}
+
+.od-form-options{display:flex;flex-wrap:wrap;gap:12px}
+.od-form-option{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.18);border-radius:999px;
+  padding:11px 18px;color:#c2c2c2;font-size:15px;
+  transition:border-color .2s ease,color .2s ease}
+.od-form-option:has(input:checked){border-color:var(--od-orange);color:#fff}
+.od-form-option input{accent-color:var(--od-orange)}
+
+.od-form-other{max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .3s ease,opacity .2s ease}
+.od-form-group--other:has(input[value="Other"]:checked) .od-form-other{
+  max-height:120px;opacity:1}
+
+/* honeypot — out of tab order and off-screen, not display:none, so a bot
+   that blindly fills visible-looking inputs still trips it */
+.od-form-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.od-form-submit{
+  align-self:flex-start;position:relative;display:inline-flex;align-items:center;
+  gap:10px;padding:14px 26px;border:none;border-radius:999px;cursor:pointer;
+  background:var(--od-orange);color:#000;font-family:inherit;font-weight:600;
+  font-size:15px;letter-spacing:.02em;overflow:hidden;isolation:isolate;
+  transition:transform .42s var(--od-e),box-shadow .42s var(--od-e)}
+.od-form-submit::before{content:"";position:absolute;inset:0;z-index:-1;background:#fff;
+  transform:translate3d(0,101%,0);transition:transform .46s var(--od-e)}
+.od-form-submit:hover{transform:translate3d(0,-2px,0);box-shadow:0 10px 26px rgba(255,255,255,.18)}
+.od-form-submit:hover::before{transform:translate3d(0,0,0)}
+.od-form-submit:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* /contact/thanks */
+.od-form-thanks{min-height:60vh;display:flex;flex-direction:column;
+  justify-content:center;gap:16px;max-width:560px;margin:0 auto;
+  padding:clamp(28px,4vw,64px)}
+
+/* header CTA: a native <details> disclosure instead of a dropdown widget.
+   <summary> reuses .od-cta as-is (same single orange element the rest of
+   the page already spends on the "View all work" link) so the trigger
+   button's look never forks from the plain-link version of itself. The
+   revealed options are intentionally NOT a second filled-orange pill pair:
+   two more solid-orange boxes next to the trigger would turn one accent
+   colour into a cluster. Outlined, orange only on hover/focus, same as the
+   form's own .od-form-option pills. */
+.od-cta-picker{position:relative}
+.od-cta-picker>summary{list-style:none;cursor:pointer}
+.od-cta-picker>summary::-webkit-details-marker{display:none}
+.od-cta-picker-panel{
+  position:absolute;top:calc(100% + 10px);right:0;z-index:20;
+  display:flex;flex-direction:column;gap:8px;min-width:230px;padding:10px;
+  background:#0a0a0a;border:1px solid rgba(255,255,255,.14);border-radius:16px;
+  box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.od-cta-picker-option{
+  display:block;padding:12px 16px;border-radius:10px;
+  color:#fff;text-decoration:none;font-size:14px;
+  border:1px solid rgba(255,255,255,.16);
+  transition:border-color .2s ease,background-color .2s ease}
+.od-cta-picker-option:hover,.od-cta-picker-option:focus-visible{
+  border-color:var(--od-orange);background:rgba(241,94,38,.1);outline:none}
+
+/* contextual "start a project" CTA, dropped after services, project cards
+   and case studies. Text-only (an arrow link, not a button) so it reads as
+   a continuation of the surrounding copy rather than a competing CTA. */
+.od-inline-cta{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+  color:#fff;text-decoration:none;font-size:14px;font-weight:600;
+  letter-spacing:.01em}
+.od-inline-cta::after{content:"→";transition:transform .25s ease}
+.od-inline-cta:hover::after{transform:translate3d(4px,0,0)}
+
+@media (prefers-reduced-motion:reduce){
+  .od-form-submit,.od-form-submit::before,.od-form-option,.od-form-other,
+  .od-form-input,.od-form-textarea,.od-cta-picker-option,
+  .od-inline-cta::after{transition:none}
+}

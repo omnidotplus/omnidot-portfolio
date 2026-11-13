@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { services } from "../lib/content";
+import { FORM_ROUTES } from "../lib/forms";
 
 /**
  * Services as an index list rather than a card row.
@@ -31,9 +33,9 @@ export default function ServicesIndex() {
       </div>
 
       {services.map((s, i) => (
-        <a
+        <Link
           key={s.num}
-          href="#contact"
+          href={FORM_ROUTES[s.formTarget]}
           className="od-svc-row"
           aria-label={s.name}
           onMouseEnter={() => setActive(i)}
@@ -49,7 +51,7 @@ export default function ServicesIndex() {
           <span className="od-svc-mark" aria-hidden="true">
             →
           </span>
-        </a>
+        </Link>
       ))}
     </div>
   );

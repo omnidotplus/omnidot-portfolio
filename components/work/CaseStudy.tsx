@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Project } from "../../lib/content";
+import { FORM_ROUTES, FORM_CTA_LABEL } from "../../lib/forms";
 
 /**
  * Case study layout.
@@ -87,6 +88,10 @@ export default function CaseStudy({ project }: { project: Project }) {
                 </div>
               ))}
             </dl>
+
+            <Link href={FORM_ROUTES[project.formTarget]} className="od-inline-cta">
+              {FORM_CTA_LABEL[project.formTarget]}
+            </Link>
           </div>
         </aside>
       </div>
