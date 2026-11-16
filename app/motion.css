@@ -345,6 +345,8 @@
   transition:border-color 320ms var(--od-e),color 320ms var(--od-e)}
 .od-cs-tags li:hover{border-color:var(--od-orange);color:#fff}
 
+.od-cs-intro-cta{margin:clamp(14px,2.5vh,24px) 0 0}
+
 /* --- the split --- */
 .od-cs-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,38%);
   gap:clamp(24px,4vw,64px);align-items:start;padding-top:clamp(28px,5vh,56px);

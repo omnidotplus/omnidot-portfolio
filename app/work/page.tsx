@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { projects } from "../../lib/content";
+import { FORM_ROUTES, FORM_SHOWCASE_CTA_LABEL } from "../../lib/forms";
 
 export const metadata: Metadata = {
-  title: "Work — Omnidot",
+  title: "Work - Omnidot",
   description: "Brand identity, fleet livery and campaign work from the Omnidot studio.",
 };
 
@@ -22,19 +23,24 @@ export default function WorkIndexPage() {
 
       <div className="od-wi-grid">
         {projects.map((p) => (
-          <Link key={p.slug} href={`/work/${p.slug}`} className="od-wi-card">
-            <figure className="od-wi-fig">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.cover} alt="" loading="lazy" />
-            </figure>
-            <h2 className="od-wi-card-title">{p.title}</h2>
-            <p className="od-wi-card-summary">{p.summary}</p>
-            <ul className="od-wi-card-tags">
-              {p.tags.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-          </Link>
+          <div key={p.slug} className="od-wi-card">
+            <Link href={`/work/${p.slug}`} className="od-wi-card-link">
+              <figure className="od-wi-fig">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.cover} alt="" loading="lazy" />
+              </figure>
+              <h2 className="od-wi-card-title">{p.title}</h2>
+              <p className="od-wi-card-summary">{p.summary}</p>
+              <ul className="od-wi-card-tags">
+                {p.tags.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </Link>
+            <Link href={FORM_ROUTES[p.formTarget]} className="od-cta-mini">
+              {FORM_SHOWCASE_CTA_LABEL[p.formTarget]}
+            </Link>
+          </div>
         ))}
       </div>
     </div>

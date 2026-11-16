@@ -109,8 +109,57 @@
 .od-inline-cta::after{content:"→";transition:transform .25s ease}
 .od-inline-cta:hover::after{transform:translate3d(4px,0,0)}
 
+/* ---------- multi-step wizard chrome ---------- */
+.od-form-wizard{display:flex;flex-direction:column;gap:clamp(26px,4vh,38px)}
+
+.od-form-progress{display:flex;flex-direction:column;gap:9px}
+.od-form-progress-label{margin:0;color:#9a9a9a;font-size:14px;letter-spacing:.02em}
+.od-form-progress-bar{height:4px;border-radius:999px;background:rgba(255,255,255,.12);
+  overflow:hidden}
+.od-form-progress-fill{height:100%;background:var(--od-orange);border-radius:inherit;
+  transition:width .3s ease}
+
+.od-form-step{border:none;margin:0;padding:0;display:flex;flex-direction:column;
+  gap:clamp(30px,4.5vh,44px)}
+.od-form-step:focus{outline:none}
+
+.od-form-wizard-actions{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.od-form-back,.od-form-next{
+  border-radius:999px;cursor:pointer;font-family:inherit;font-size:15px;
+  letter-spacing:.02em;padding:14px 26px;transition:border-color .2s ease,
+  color .2s ease,background-color .2s ease}
+.od-form-back{border:1px solid rgba(255,255,255,.22);background:transparent;color:#c2c2c2}
+.od-form-back:hover{border-color:#fff;color:#fff}
+.od-form-next{border:none;background:var(--od-orange);color:#000;font-weight:600;
+  margin-left:auto}
+.od-form-next:hover{background:#fff}
+.od-form-back:focus-visible,.od-form-next:focus-visible{
+  outline:2px solid var(--od-orange);outline-offset:3px}
+.od-form-submit-slot{display:inline-flex;margin-left:auto}
+.od-form-submit-slot .od-form-submit{align-self:center}
+
+@media (max-width:540px){
+  .od-form-wizard-actions{flex-direction:column-reverse;align-items:stretch}
+  .od-form-back,.od-form-next{width:100%;justify-content:center;margin:0}
+  .od-form-submit-slot{width:100%;margin:0}
+  .od-form-submit-slot .od-form-submit{width:100%;justify-content:center}
+}
+
+/* ---------- showcase CTA: "get something like this", on real work itself,
+   not just at the end of unrelated credits text ---------- */
+.od-cta-mini{
+  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  padding:9px 16px;border-radius:999px;border:1px solid var(--od-orange);
+  color:var(--od-orange);background:transparent;text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:.01em;
+  transition:background-color .2s ease,color .2s ease}
+.od-cta-mini::after{content:"→"}
+.od-cta-mini:hover,.od-cta-mini:focus-visible{background:var(--od-orange);color:#000;
+  outline:none}
+
 @media (prefers-reduced-motion:reduce){
   .od-form-submit,.od-form-submit::before,.od-form-option,.od-form-other,
   .od-form-input,.od-form-textarea,.od-cta-picker-option,
-  .od-inline-cta::after{transition:none}
+  .od-inline-cta::after,.od-form-progress-fill,.od-form-back,.od-form-next,
+  .od-cta-mini{transition:none}
 }

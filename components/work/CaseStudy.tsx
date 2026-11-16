@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Project } from "../../lib/content";
-import { FORM_ROUTES, FORM_CTA_LABEL } from "../../lib/forms";
+import { FORM_ROUTES, FORM_SHOWCASE_CTA_LABEL } from "../../lib/forms";
 
 /**
  * Case study layout.
@@ -36,6 +36,14 @@ export default function CaseStudy({ project }: { project: Project }) {
             <li key={t}>{t}</li>
           ))}
         </ul>
+
+        {/* clearly attached to the work itself, visible with zero scrolling,
+            rather than only reachable at the bottom of the narrative panel */}
+        <div className="od-cs-intro-cta">
+          <Link href={FORM_ROUTES[project.formTarget]} className="od-cta-mini">
+            {FORM_SHOWCASE_CTA_LABEL[project.formTarget]}
+          </Link>
+        </div>
       </header>
 
       <div className={`od-cs-body${open ? "" : " od-cs-collapsed"}`}>
@@ -90,7 +98,7 @@ export default function CaseStudy({ project }: { project: Project }) {
             </dl>
 
             <Link href={FORM_ROUTES[project.formTarget]} className="od-inline-cta">
-              {FORM_CTA_LABEL[project.formTarget]}
+              {FORM_SHOWCASE_CTA_LABEL[project.formTarget]}
             </Link>
           </div>
         </aside>
