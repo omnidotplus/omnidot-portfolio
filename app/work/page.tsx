@@ -24,6 +24,9 @@ export default function WorkIndexPage() {
       <div className="od-wi-grid">
         {projects.map((p) => (
           <div key={p.slug} className="od-wi-card">
+            <Link href={FORM_ROUTES[p.formTarget]} className="od-cta-mini">
+              {FORM_SHOWCASE_CTA_LABEL[p.formTarget]}
+            </Link>
             <Link href={`/work/${p.slug}`} className="od-wi-card-link">
               <figure className="od-wi-fig">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -36,9 +39,6 @@ export default function WorkIndexPage() {
                   <li key={t}>{t}</li>
                 ))}
               </ul>
-            </Link>
-            <Link href={FORM_ROUTES[p.formTarget]} className="od-cta-mini">
-              {FORM_SHOWCASE_CTA_LABEL[p.formTarget]}
             </Link>
           </div>
         ))}
