@@ -123,8 +123,12 @@
 .od-form-progress-fill{height:100%;width:100%;background:var(--od-orange);
   border-radius:inherit;transform-origin:0 0;transition:transform .3s ease}
 
-.od-form-step{border:none;margin:0;padding:0;display:flex;flex-direction:column;
+/* author styles always beat the UA [hidden]{display:none} rule regardless
+   of specificity, so the flex layout must not apply while hidden is set,
+   or every step renders stacked on top of each other at once */
+.od-form-step:not([hidden]){display:flex;flex-direction:column;
   gap:clamp(30px,4.5vh,44px)}
+.od-form-step{border:none;margin:0;padding:0}
 .od-form-step:focus{outline:none}
 
 .od-form-wizard-actions{display:flex;align-items:center;justify-content:space-between;gap:16px}
@@ -139,7 +143,8 @@
 .od-form-next:hover{background:#fff}
 .od-form-back:focus-visible,.od-form-next:focus-visible{
   outline:2px solid var(--od-orange);outline-offset:3px}
-.od-form-submit-slot{border:none;margin:0 0 0 auto;padding:0;display:inline-flex}
+.od-form-submit-slot{border:none;margin:0 0 0 auto;padding:0}
+.od-form-submit-slot:not([hidden]){display:inline-flex}
 .od-form-submit-slot .od-form-submit{align-self:center}
 .od-form-submit-slot:disabled .od-form-submit{cursor:not-allowed}
 
@@ -166,6 +171,10 @@
   transform:translate3d(0,-2px,0);box-shadow:0 10px 22px rgba(241,94,38,.35);
   outline:none}
 .od-cta-mini:hover::after{transform:translate3d(3px,0,0)}
+
+/* on a card/figure (position:relative on the ancestor), sit inside the
+   image itself rather than as a separate strip before it */
+.od-cta-mini--overlay{position:absolute;top:16px;left:16px;z-index:5}
 
 @media (prefers-reduced-motion:reduce){
   .od-form-submit,.od-form-submit::before,.od-form-option,.od-form-other,

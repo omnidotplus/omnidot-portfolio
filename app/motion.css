@@ -345,7 +345,11 @@
   transition:border-color 320ms var(--od-e),color 320ms var(--od-e)}
 .od-cs-tags li:hover{border-color:var(--od-orange);color:#fff}
 
-.od-cs-intro-cta{margin:clamp(14px,2.5vh,24px) 0 0}
+.od-cs-head-row{display:flex;flex-wrap:wrap;align-items:center;
+  justify-content:space-between;gap:16px;
+  margin:clamp(18px,3vh,32px) 0 0}
+.od-cs-head-row .od-cs-tags{margin:0}
+.od-cs-intro-cta{margin:0}
 
 /* --- the split --- */
 .od-cs-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,38%);

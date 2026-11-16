@@ -9,11 +9,15 @@ export type WizardStep = { label: string; content: React.ReactNode };
  * with Back / Next / Submit and a progress bar. The <form> underneath is
  * untouched, it's still one plain HTML POST, every field from every step
  * lives in the DOM the whole time, this only toggles which fieldset is
- * `hidden`. A step's required fields are validated with the Constraint
- * Validation API on Next (`fieldset.reportValidity()`, which also respects
- * any `setCustomValidity()` set elsewhere, e.g. RequireAtLeastOne) so the
- * same native error bubble the rest of the form already uses blocks
- * advancing past an incomplete step.
+ * `hidden`. A step's required fields are validated on Next by calling
+ * `reportValidity()` on every input/textarea/select inside the current
+ * fieldset directly (NOT on the fieldset itself: a <fieldset> does not
+ * aggregate its descendants' constraint validity, calling reportValidity()
+ * on the fieldset always reports valid regardless of what's inside it,
+ * which silently let every required field through until this was actually
+ * exercised in a browser). Per-element reportValidity() also respects any
+ * setCustomValidity() set elsewhere (e.g. RequireAtLeastOne), and shows the
+ * same native error bubble the rest of the form already uses.
  *
  * Reaching the submit button is gated three separate ways, because a
  * `hidden` submit button is still a valid target for implicit form
@@ -68,7 +72,18 @@ export default function FormWizard({
 
   const goNext = () => {
     const current = fieldsetRefs.current[indexRef.current];
-    if (current && !current.reportValidity()) return;
+    if (current) {
+      // A <fieldset> does not aggregate its descendants' validity: calling
+      // reportValidity() on the fieldset itself always reports valid, since
+      // the fieldset is never the invalid thing. Every real control inside
+      // has to be checked (and will show its own native error bubble).
+      const fields = current.querySelectorAll<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >("input, textarea, select");
+      for (const field of fields) {
+        if (!field.reportValidity()) return;
+      }
+    }
     setIndex((i) => Math.min(i + 1, last));
   };
   const goBack = () => setIndex((i) => Math.max(i - 1, 0));

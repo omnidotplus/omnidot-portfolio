@@ -24,7 +24,7 @@ export default function WorkIndexPage() {
       <div className="od-wi-grid">
         {projects.map((p) => (
           <div key={p.slug} className="od-wi-card">
-            <Link href={FORM_ROUTES[p.formTarget]} className="od-cta-mini">
+            <Link href={FORM_ROUTES[p.formTarget]} className="od-cta-mini od-cta-mini--overlay">
               {FORM_SHOWCASE_CTA_LABEL[p.formTarget]}
             </Link>
             <Link href={`/work/${p.slug}`} className="od-wi-card-link">

@@ -31,18 +31,21 @@ export default function CaseStudy({ project }: { project: Project }) {
         <h1 className="od-cs-title">{project.title}</h1>
         <p className="od-cs-summary">{project.summary}</p>
 
-        <ul className="od-cs-tags">
-          {project.tags.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
+        <div className="od-cs-head-row">
+          <ul className="od-cs-tags">
+            {project.tags.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
 
-        {/* clearly attached to the work itself, visible with zero scrolling,
-            rather than only reachable at the bottom of the narrative panel */}
-        <div className="od-cs-intro-cta">
-          <Link href={FORM_ROUTES[project.formTarget]} className="od-cta-mini">
-            {FORM_SHOWCASE_CTA_LABEL[project.formTarget]}
-          </Link>
+          {/* clearly attached to the work itself, visible with zero
+              scrolling, rather than only reachable at the bottom of the
+              narrative panel */}
+          <div className="od-cs-intro-cta">
+            <Link href={FORM_ROUTES[project.formTarget]} className="od-cta-mini">
+              {FORM_SHOWCASE_CTA_LABEL[project.formTarget]}
+            </Link>
+          </div>
         </div>
       </header>
 
