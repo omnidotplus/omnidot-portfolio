@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Project } from "../../lib/content";
-import { FORM_ROUTES, FORM_SHOWCASE_CTA_LABEL } from "../../lib/forms";
+import FormLink from "../FormLink";
 
 /**
  * Case study layout.
@@ -24,12 +24,23 @@ export default function CaseStudy({ project }: { project: Project }) {
   return (
     <article className="od-cs">
       <header className="od-cs-head">
-        <Link href="/" className="od-cs-back">
+        <Link href="/work" className="od-cs-back">
           <span aria-hidden="true">←</span> Work
         </Link>
 
         <h1 className="od-cs-title">{project.title}</h1>
         <p className="od-cs-summary">{project.summary}</p>
+
+        {/* Stated up front, above the fold, in its own right — not buried in
+            the credits. A reader must not be able to mistake a studio concept
+            for a commissioned engagement at any point on this page. */}
+        {project.concept ? (
+          <p className="od-cs-concept-note">
+            <strong>Studio concept.</strong> A self-directed direction showing how
+            Omnidot approaches this kind of build. No client commissioned it, and
+            the imagery is licensed stock standing in for a finished site.
+          </p>
+        ) : null}
 
         <div className="od-cs-head-row">
           <ul className="od-cs-tags">
@@ -42,9 +53,7 @@ export default function CaseStudy({ project }: { project: Project }) {
               scrolling, rather than only reachable at the bottom of the
               narrative panel */}
           <div className="od-cs-intro-cta">
-            <Link href={FORM_ROUTES[project.formTarget]} className="od-cta-mini">
-              {FORM_SHOWCASE_CTA_LABEL[project.formTarget]}
-            </Link>
+            <FormLink target={project.formTarget} className="od-cta-mini" />
           </div>
         </div>
       </header>
@@ -100,9 +109,7 @@ export default function CaseStudy({ project }: { project: Project }) {
               ))}
             </dl>
 
-            <Link href={FORM_ROUTES[project.formTarget]} className="od-inline-cta">
-              {FORM_SHOWCASE_CTA_LABEL[project.formTarget]}
-            </Link>
+            <FormLink target={project.formTarget} className="od-inline-cta" />
           </div>
         </aside>
       </div>

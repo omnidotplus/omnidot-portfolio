@@ -26,7 +26,7 @@ export default function MotionLayer() {
     const cleanups: Array<() => void> = [];
 
     // a remount can inherit interaction classes left set when the page unmounted
-    ["od-card-hot", "od-svc-live", "od-orb-hot", "od-nav-open"].forEach((c) =>
+    ["od-card-hot", "od-orb-hot", "od-nav-open"].forEach((c) =>
       D.querySelectorAll("." + c).forEach((el) => el.classList.remove(c))
     );
     H.classList.remove("od-nav-lock", "od-intro-lock");
@@ -99,13 +99,12 @@ export default function MotionLayer() {
       ".about-t,.service-top-left-text,.project-t,.team-top-text,.testi-t,.contact-t",
       ".hero-text-wrap,.hero-fast-text,.hero-bottom-text,.hero-right-img-content-wrap",
       ".about-left-content-wrap,.about-right-content-wrap",
-      ".od-svc-row",
+      ".od-svc-card",
       ".project-left-bottom-content-wrap,.project-left-bottom-content-wrap-02," +
         ".project-right-bottom-content-wrap-02,.project-right-bottom-content-wrap-03",
       ".team-item-right",
       ".testimonial-item",
-      ".contact-left-top-content-wrap,.contact-left-center-wrap," +
-        ".contact-left-bottom-content-wrap,.contact-right-from-wrap",
+      ".od-contact-head,.od-contact-ctas,.od-contact-details",
       ".footer-top-left-content,.footer-top-right-content,.footer-bottom-content-wrap",
     ];
 
@@ -195,9 +194,20 @@ export default function MotionLayer() {
        Words turn from muted to white as the heading travels through the
        viewport, so the type resolves as the reader arrives at it. */
     {
-      const FILL = ".about-h2,.team-top-h2,.contact-h2,.testi-h2,.service-h2,.project-left-title";
+      // .contact-h2 is deliberately absent: the fill empties the element and
+      // rebuilds it as per-word spans, which would destroy the accent span
+      // inside it — and a heading that sits at 26% opacity until scrolled
+      // past read as washed-out grey rather than as an effect.
+      const FILL = ".about-h2,.team-top-h2,.testi-h2,.service-h2,.project-left-title";
       const heads = $(FILL).filter((el) => !el.querySelector(".od-w"));
       heads.forEach((el) => {
+        // A <br> contributes no character to textContent, so the source
+        // "...creative digital<br />agency helping..." collapsed into
+        // "digitalagency" once the heading was re-split on whitespace.
+        // Substituting a real space first keeps the words apart; the line
+        // break itself is not preserved, but these headings are re-wrapped
+        // by the word spans anyway.
+        el.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
         const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
         if (!text) return;
         // capture the section's own text colour before .od-fill overrides it,
@@ -260,7 +270,18 @@ export default function MotionLayer() {
     const counterIOs: IntersectionObserver[] = [];
     const counterChecks: Array<() => void> = [];
     $(".project-bottom-h2,.testi-top-t").forEach((el) => {
-      const raw = el.textContent?.replace(/ /g, " ").trim() ?? "";
+      // Read the pristine label ONCE and park it on the node.
+      //
+      // render(0) overwrites textContent, so the source string has to
+      // survive a remount independently of it. React StrictMode runs
+      // mount -> cleanup -> mount in development, and a client-side
+      // navigation back to this page remounts too; re-reading textContent
+      // on that second mount picked up "0+" instead of "10+", parsed a
+      // target of 0, and animated 0 -> 0 forever. Every metric then read
+      // zero permanently, with only a hard reload clearing it.
+      const read = () => el.textContent?.replace(/ /g, " ").trim() ?? "";
+      const raw = el.dataset.odCount ?? read();
+      el.dataset.odCount = raw;
       const m = raw.match(/^(\D*?)([\d.,]+)(.*)$/);
       if (!m) return;
       const [, pre, numStr, post] = m;
@@ -306,7 +327,11 @@ export default function MotionLayer() {
       );
       io.observe(el);
       counterIOs.push(io);
-      cleanups.push(() => cancelAnimationFrame(frame));
+      cleanups.push(() => {
+        cancelAnimationFrame(frame);
+        // hand the node back showing its real value, never a stranded 0
+        el.textContent = raw;
+      });
     });
     cleanups.push(() => counterIOs.forEach((io) => io.disconnect()));
     {

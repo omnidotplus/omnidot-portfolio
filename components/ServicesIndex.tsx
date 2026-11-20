@@ -1,58 +1,59 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { services } from "../lib/content";
-import { FORM_ROUTES } from "../lib/forms";
+import FormLink from "./FormLink";
+import { services, WORK_CATEGORIES } from "../lib/content";
 
 /**
- * Services as an index list rather than a card row.
+ * The three services, side by side.
  *
- * Hovering a row bleeds that service's image in behind the whole list at low
- * opacity under a black gradient, so the type stays readable. This is state-
- * driven rather than DOM-driven, which is why it survived the port cleanly.
+ * Each card now leads to that discipline's showcase rather than straight into
+ * a brief — seeing the work is the step that belongs here, and the brief is
+ * one click further on for anyone already convinced.
+ *
+ * The card is a <div>, not an <a>: it holds two destinations, and an anchor
+ * inside an anchor is invalid HTML that browsers resolve by splitting the
+ * markup. The showcase link is stretched across the whole card with an
+ * ::after overlay, and the brief link is lifted above it — so the big target
+ * still works while the secondary action stays independently clickable.
  */
 export default function ServicesIndex() {
-  const [active, setActive] = useState<number | null>(null);
-
   return (
-    <div
-      className={`od-svc${active !== null ? " od-svc-live" : ""}`}
-      onMouseLeave={() => setActive(null)}
-    >
-      <div className="od-svc-bg" aria-hidden="true">
-        {services.map((s, i) => (
-          <img
-            key={s.num}
-            src={s.image}
-            alt=""
-            loading="lazy"
-            className={i === active ? "od-on" : undefined}
-          />
-        ))}
-      </div>
+    <div className="od-svc">
+      {services.map((s) => {
+        const category = WORK_CATEGORIES[s.showcase];
+        return (
+          <div key={s.num} className="od-svc-card">
+            <span className="od-svc-num">{s.num}</span>
 
-      {services.map((s, i) => (
-        <Link
-          key={s.num}
-          href={FORM_ROUTES[s.formTarget]}
-          className="od-svc-row"
-          aria-label={s.name}
-          onMouseEnter={() => setActive(i)}
-          onFocus={() => setActive(i)}
-        >
-          <span className="od-svc-num">{s.num}</span>
-          <h3 className="od-svc-name">{s.name}</h3>
-          <span className="od-svc-tags">
-            {s.tags.map((t) => (
-              <span key={t}>{t}</span>
-            ))}
-          </span>
-          <span className="od-svc-mark" aria-hidden="true">
-            →
-          </span>
-        </Link>
-      ))}
+            <h3 className="od-svc-name">
+              <Link href={category.route} className="od-svc-stretch">
+                {s.name}
+              </Link>
+            </h3>
+            <p className="od-svc-blurb">{s.blurb}</p>
+
+            <span className="od-svc-tags">
+              {s.tags.map((t) => (
+                <span key={t}>{t}</span>
+              ))}
+            </span>
+
+            <span className="od-svc-foot">
+              <span className="od-svc-action">
+                See {category.noun} work
+                <span className="od-svc-mark" aria-hidden="true">
+                  →
+                </span>
+              </span>
+
+              <FormLink
+                target={s.formTarget}
+                variant="general"
+                className="od-svc-brief"
+              />
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

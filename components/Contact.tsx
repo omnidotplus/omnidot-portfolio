@@ -1,9 +1,61 @@
-import Link from "next/link";
+import FormLink from "./FormLink";
 
+/**
+ * Contact, centred on the one line that matters.
+ *
+ * The right-hand form is gone. It was inherited from the template and had
+ * never worked: `method="get"` with no `action` (so it reloaded the page and
+ * discarded everything), a leftover Webflow Turnstile attribute with no
+ * runtime behind it, and two separate inputs both named `email` — the phone
+ * number would have overwritten the address even if something had been
+ * listening. Intake now happens on the two Google Forms, which is where the
+ * questions that actually scope a project live.
+ *
+ * What is left is the invitation, the two ways to take it up, and the direct
+ * details for anyone who would rather just call.
+ */
 export default function Contact() {
   return (
-    <>
-      <section id={"contact"} className={"contact"}><div className={"w-layout-blockcontainer contact-container w-container"}><div className={"contact-row"}><div className={"contact-left-content-wrap"}><div className={"contact-left-top-content-wrap"}><div style={{  }} className={"contact-t"}>/ / / / / / / Contact</div><h2 style={{  }} className={"contact-h2"}>Let’s work together</h2></div><div className={"contact-left-bottom-content-wrap"}><div className={"contact-left-center-wrap"}><div style={{  }} className={"contact-center-box"}><a href={"tel:+2348134408179"} className={"contact-header-number-t w-inline-block"}><h3 className={"contact-center-text"}>+234-8134408179</h3></a><div className={"contact-center-t"}>Phone Number</div></div><div style={{  }} className={"contact-center-box"}><a href={"mailto:omnidotplus@gmail.com"} className={"contact-header-email-t w-inline-block"}><h4 className={"contact-center-text"}>omnidotplus@gmail.com</h4></a><div className={"contact-center-t"}>Email Address</div></div></div><div style={{  }} className={"contact-left-bottom-icon-link"}><a href={"https://www.instagram.com/designit_byomnidot/"} className={"contact-link w-inline-block"}><img src="/assets/6a6086aafda4c8b94c9b9073_Instagram-Icon.svg" loading={"lazy"} alt={"Instagram logo icon."} className={"contact-link-img"} /></a></div><div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "28px" }}><Link href={"/contact/website"} className={"od-form-submit"}>Start a website project</Link><Link href={"/contact/brand"} className={"od-form-submit"}>Start a brand project</Link></div></div></div><div style={{  }} className={"contact-right-content-wrap"}><div className={"contact-right-from-wrap"}><div className={"contact-from w-form"}><form id={"email-form"} name={"email-form"} data-name={"Email Form"} method={"get"} data-turnstile-sitekey={"0x4AAAAAAAQTptj2So4dx43e"}><input className={"text-input-01 w-input"} maxLength={256} name={"name"} data-name={"Name"} placeholder={"Full name *"} type={"text"} id={"name"} /><input className={"text-input-02 w-input"} maxLength={256} name={"email"} data-name={"Email"} placeholder={"Email *"} type={"email"} id={"email-02"} required={true} /><input className={"text-input-03 w-input"} maxLength={256} name={"email"} data-name={"Email"} placeholder={"Phone number *"} type={"tel"} id={"email"} required={true} /><input className={"text-input-04 w-input"} maxLength={256} name={"Comment"} data-name={"Comment"} placeholder={"Your comment *"} type={"text"} id={"Comment"} required={true} /><input type={"submit"} data-wait={"Please wait..."} className={"submit-button w-button"} value={"Submit your message"} /></form><div className={"success-message w-form-done"}><div>Thank you! Your submission has been received!</div></div><div className={"error-message w-form-fail"}><div>Oops! Something went wrong while submitting the form.</div></div></div></div></div></div></div></section>
-    </>
+    <section id={"contact"} className={"contact"}>
+      <div className={"w-layout-blockcontainer contact-container w-container"}>
+        <div className={"od-contact"}>
+          <div className={"od-contact-head"}>
+            <h2 className={"contact-h2"}>
+              Let&rsquo;s work{" "}
+              <span className={"od-contact-accent"}>together</span>
+            </h2>
+            <p className={"od-contact-lead"}>
+              Tell us what you&rsquo;re building. The brief takes a few minutes and gives us
+              enough to come back with a real proposal rather than a guess.
+            </p>
+          </div>
+
+          <div className={"od-contact-ctas"}>
+            <FormLink target="website" variant="general" className={"od-contact-cta"} />
+            <FormLink target="brand" variant="general" className={"od-contact-cta"} />
+          </div>
+
+          <div className={"od-contact-details"}>
+            <a href={"tel:+2348134408179"} className={"od-contact-detail"}>
+              <span className={"od-contact-detail-value"}>+234 813 440 8179</span>
+              <span className={"od-contact-detail-label"}>Phone</span>
+            </a>
+            <a href={"mailto:omnidotplus@gmail.com"} className={"od-contact-detail"}>
+              <span className={"od-contact-detail-value"}>omnidotplus@gmail.com</span>
+              <span className={"od-contact-detail-label"}>Email</span>
+            </a>
+            <a
+              href={"https://www.instagram.com/designit_byomnidot/"}
+              className={"od-contact-detail"}
+              target={"_blank"}
+              rel={"noopener noreferrer"}
+            >
+              <span className={"od-contact-detail-value"}>@designit_byomnidot</span>
+              <span className={"od-contact-detail-label"}>Instagram</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

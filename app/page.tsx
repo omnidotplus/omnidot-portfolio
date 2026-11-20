@@ -19,8 +19,14 @@ export default function Page() {
           <span className="od-blob od-blob-c" />
           <span className="od-blob od-blob-d" />
         </div>
-        <Header />
-        <Hero />
+        {/* Header and hero share one viewport-tall block so the hero always
+            owns the first screen and the next section starts below the fold.
+            The hero takes whatever height the header leaves, which keeps this
+            correct at any header size — no hardcoded offset to drift. */}
+        <div className="od-fold">
+          <Header />
+          <Hero />
+        </div>
         <About />
         <Services />
         <Projects />
